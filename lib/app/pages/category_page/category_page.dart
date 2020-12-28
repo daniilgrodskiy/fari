@@ -1,0 +1,307 @@
+import 'package:fari/app/custom_widgets/common_widgets/add_button.dart';
+import 'package:fari/app/custom_widgets/common_widgets/sort_tasks_bottom_sheet.dart';
+import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
+import 'package:fari/app/custom_widgets/top_bar/search_bar.dart';
+import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
+import 'package:fari/app/custom_widgets/top_bar/top_bar_button.dart';
+import 'package:fari/app/hext_color.dart';
+import 'package:fari/app/models/category.dart';
+import 'package:fari/app/models/task.dart';
+import 'package:fari/app/pages/category_page/category_page_model.dart';
+import 'package:fari/app/pages/edit_category_page/edit_category_page.dart';
+import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
+import 'package:fari/services/database.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+
+
+class CategoryPage extends StatelessWidget {
+
+  CategoryPage({
+    @required this.model,
+    @required this.database, // Only passing database in for EditCategoryPage(...)
+    @required this.tasks,
+    @required this.category,
+  });
+
+  final CategoryPageModel model;
+  final Database database;
+  final List<Task> tasks;
+  final Category category;
+
+  static Future<void> create(BuildContext context, {@required Category category}) async {
+    final database = Provider.of<Database>(context, listen: false);
+
+    // Get category
+    await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (context) {
+         return StreamBuilder<Category>(
+            stream: database.categoryStream(categoryId: category.id),
+            builder: (context, categorySnapshot) {
+              if (categorySnapshot.hasError) {
+                // Will only show when Category has been deleted
+                return Scaffold(
+                  appBar: TopBar(hasBackButton: true,),
+                  body: Center(
+                    child: Text(
+                      "Error retrieving category.",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline6.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                        fontSize: 15.0,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              if (categorySnapshot.hasData) {
+                // Get tasks
+                return StreamBuilder<List<Task>>(
+                  stream: database.tasksStream(categoryId: category.id),
+                  builder: (context, tasksSnapshot) {
+                    if (tasksSnapshot.hasData) {
+                      return ChangeNotifierProvider<CategoryPageModel>(
+                        create: (context) => CategoryPageModel(),
+                        child: Consumer<CategoryPageModel>(
+                          builder: (context, model, _) {
+                            // return CategoryPage();
+                            return CategoryPage(
+                              database: database,
+                              model: model,
+                              tasks: tasksSnapshot.data,
+                              // category: ,
+                              category: categorySnapshot.data,
+                            );
+                          }
+                        ),
+                      );
+                    }
+                    return Container();
+                  }
+                );
+              }
+              return Container();
+            }
+         );
+        }
+      ),
+    );
+  }
+
+  /// Build methood
+
+  @override
+  Widget build(BuildContext context) {
+    // return Scaffold(
+    //   appBar: _buildTopBar(context),
+    //   // backgroundColor: Colors.blue,
+    //   backgroundColor: Colors.grey[50],
+    // );
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: true,
+      appBar: _buildTopBar(context),
+      backgroundColor: Colors.grey[50],
+      body: Stack(
+        children: <Widget>[
+          _buildContent(context),
+          AddButton(onTap: () => EditTaskPage.show(context, category: category, database: database),),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return TopBar.searchBarOnly(
+      context, 
+      SearchBar(hintText: "Search tasks in '${category.name}'", onChanged: model.updateSearch), 
+    );
+    // return TopBar(
+    //   category: category,
+    //   searchBar: SearchBar(hintText: "Search tasks", onChanged: model.updateSearch,),
+    //   hasBackButton: true,
+    //   actions: <TopBarButton>[
+    //     TopBarButton(
+    //       text: "Sort", 
+    //       icon: FontAwesomeIcons.sort,
+    //       onTap: () {
+    //         showModalBottomSheet(
+    //           context: context,
+    //           backgroundColor: Colors.transparent,
+    //           useRootNavigator: true,
+    //           builder: (context) => SortTasksBottomSheet(
+    //             showCategoryOption: false,
+    //             currentSortType: model.sortType,
+    //             onTap: (newSortType) {
+    //               Navigator.pop(context);
+    //               model.updateSortType(newSortType);
+    //             },
+    //           )
+    //         );
+    //       }
+    //     ),
+    //     TopBarButton(
+    //       text: "Edit", 
+    //       icon: FontAwesomeIcons.pencilAlt,
+    //       onTap: () {
+    //         return EditCategoryPage.show(context, category: category, database: database);
+    //         // I was trying to retreive a boolean value from EditCategoryPage(...), but it fell flat :|
+    //         // final isDeleted = await EditCategoryPage.show(context, category: category, database: database);
+    //         // If 'isDeleted' is true, that means that the task has been deleted! 
+    //         // if (isDeleted == true) 
+    //         //   Navigator.pop(context);
+    //       }
+    //     ),
+    //   ],
+    // );
+  }
+
+ 
+  Widget _buildContent(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        SizedBox(height: 20.0,),
+        _buildHeader(context),
+        SizedBox(height: 20.0,),
+        _buildTasks(),
+        SizedBox(height: 150.0,),
+      ],
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(left: 20.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(
+                  child: Row(
+                    children: <Widget>[
+                      // Name of category
+                      Container(
+                        child: Center(
+                          child: Text(
+                            category.name,
+                            style: Theme.of(context).textTheme.headline6.copyWith(
+                              color: Colors.black.withAlpha(200),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 30.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10.0,),
+                      GestureDetector(
+                        onTap: () {
+                          EditCategoryPage.show(context, category: category, database: database);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo[400],
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Text(
+                            "Edit",
+                            style: Theme.of(context).textTheme.headline6.copyWith(
+                              color: Colors.white,
+                              fontSize: 10.0
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  (tasks.length.toString() ?? "No ") + " tasks",
+                  style: Theme.of(context).textTheme.headline6.copyWith(
+                    color: Colors.black.withAlpha(150),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 15.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Spacer(),
+            // GestureDetector(
+            //   onTap: () {
+            //     showModalBottomSheet(
+            //       context: context,
+            //       backgroundColor: Colors.transparent,
+            //       useRootNavigator: true,
+            //       builder: (context) => SortTasksBottomSheet(
+            //         showCategoryOption: false,
+            //         currentSortType: model.sortType,
+            //         onTap: (newSortType) {
+            //           Navigator.pop(context);
+            //           model.updateSortType(newSortType);
+            //         },
+            //       )
+            //     );
+            //   },
+            //   child: Container(
+            //     padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            //     decoration: BoxDecoration(
+            //       color: Colors.indigo[400],
+            //       borderRadius: BorderRadius.circular(5.0),
+            //     ),
+            //     child: Text(
+            //       "Sort",
+            //       style: Theme.of(context).textTheme.headline6.copyWith(
+            //         color: Colors.white,
+            //         fontSize: 15.0
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(width: 10.0,),
+            // GestureDetector(
+            //   onTap: () {
+            //   },
+            //   child: Container(
+            //     padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            //     decoration: BoxDecoration(
+            //       color: Colors.indigo[400],
+            //       borderRadius: BorderRadius.circular(5.0),
+            //     ),
+            //     child: Text(
+            //       "Filter",
+            //       style: Theme.of(context).textTheme.headline6.copyWith(
+            //         color: Colors.white,
+            //         fontSize: 15.0
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            SizedBox(width: 20.0,),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildTasks() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      itemCount: tasks.length,
+      itemBuilder: (context, index) =>
+        // I'M SO HAPPY LMAOOO ONLY SHOW TASKS THAT MATCH UP BY NAME BRO I AS TRYING TO QUERY THE WHOLE DAMN DATABASE OMG THANK GOD I REALIZED THIS WAY WORKS TOO OMG IM SO HAPPY BC I REALIZED THAT BECAUSE WE RESET THE PAGE EACH TIME, THE MODEL AUTOMATICALLY QUERIES EACH TIME WE SEARCH SOMETHING NEW UP (BAD BAD BAD)
+        tasks[index].name.toLowerCase().contains(model.search.toLowerCase()) ||
+        tasks[index].description.toLowerCase().contains(model.search.toLowerCase())
+          ? TaskWidget(task: tasks[index], database: database, showDate: true,)
+          : Container()
+    );
+  }
+
+}
