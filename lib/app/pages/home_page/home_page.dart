@@ -24,48 +24,43 @@ class HomePage extends StatefulWidget {
     this.model,
   });
 
-
   final List<Task> tasks;
   final HomePageModel model;
- 
+
   @override
   _HomePageState createState() => _HomePageState();
 
-  static Widget create(BuildContext context)  {
+  static Widget create(BuildContext context) {
     final database = Provider.of<Database>(context, listen: false);
 
-
     return StreamBuilder<List<Task>>(
-      stream: database.tasksStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final tasks = snapshot.data;
-          tasks.sort(TaskSortMethods.dueDate);
-          return ChangeNotifierProvider<HomePageModel>(
-            create: (context) => HomePageModel(
-              selectedDate: DateTime.now(),
-              showCategories: true,
-            ),
-            child: Consumer<HomePageModel>(
-              builder: (context, model, _) {
+        stream: database.tasksStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final tasks = snapshot.data;
+            tasks.sort(TaskSortMethods.dueDate);
+            return ChangeNotifierProvider<HomePageModel>(
+              create: (context) => HomePageModel(
+                selectedDate: DateTime.now(),
+                showCategories: true,
+              ),
+              child: Consumer<HomePageModel>(builder: (context, model, _) {
                 return HomePage(
                   model: model,
                   tasks: tasks,
                 );
-              }
-            ),
+              }),
+            );
+          }
+          return Container(
+            color: Colors.grey[50],
           );
-        }
-        return Container(
-          color: Colors.grey[50],
-        );
-      }
-    );
+        });
   }
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   /// Instance variables
 
   AnimationController _animationController;
@@ -82,7 +77,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   void initState() {
-    _animationController = new AnimationController(duration: new Duration(milliseconds: 200), vsync: this);
+    _animationController = new AnimationController(
+        duration: new Duration(milliseconds: 200), vsync: this);
     _animationController.forward();
     super.initState();
   }
@@ -98,7 +94,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final database = Provider.of<Database>(context);
-    final user = Provider.of<User>(context);
 
     // Category category = new Category(
     //   id: "2020-05-18T15:10:07.161460",
@@ -106,11 +101,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     //   name: "School",
     // );
 
-    
     // CategoryPage.create(context, category: category);
 
     // CalendarPage.show(context);
-
 
     _countTasks();
 
@@ -122,7 +115,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       body: Stack(
         children: <Widget>[
           _buildContent(context, database),
-          AddButton(onTap: () => EditTaskPage.show(context),),
+          AddButton(
+            onTap: () => EditTaskPage.show(context),
+          ),
           Positioned(
             top: 20.0,
             right: 10.0,
@@ -138,10 +133,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 child: Text(
                   "Calendar",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
-                    color: Colors.white,
-                    fontSize: 15.0
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(color: Colors.white, fontSize: 15.0),
                 ),
               ),
             ),
@@ -151,7 +146,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-
   void _countTasks() {
     // Creates tasks counter!
     _tasksPerDay = {};
@@ -160,65 +154,68 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     tasks.forEach((task) {
       if (task.day != null) {
         _tasksPerDay.update(
-          DateTime(task.day.year, task.day.month, task.day.day), 
-          (numberOfTasks) => numberOfTasks = numberOfTasks + 1, 
-          ifAbsent: () => 1
-        );
+            DateTime(task.day.year, task.day.month, task.day.day),
+            (numberOfTasks) => numberOfTasks = numberOfTasks + 1,
+            ifAbsent: () => 1);
       }
 
       if (task.categoryId != null) {
-        _tasksPerCategory.update(
-          task.categoryId, 
-          (numberOfTasks) => numberOfTasks = numberOfTasks + 1, 
-          ifAbsent: () => 1
-        );
+        _tasksPerCategory.update(task.categoryId,
+            (numberOfTasks) => numberOfTasks = numberOfTasks + 1,
+            ifAbsent: () => 1);
       }
     });
   }
 
   Widget _buildTopBar() {
     return TopBar(
-      title: "Home",  
+      title: "Home",
     );
   }
 
-  Widget _buildContent(BuildContext context, Database database, ) {
+  Widget _buildContent(BuildContext context, Database database) {
     // TODO: Have the dates show up by heading via "Today", "Tomorrow", "Saturday", ""
     // TODO: Figure out how to handle showing time
     // TODO: Implement a 'swipe to complete' system and add a 'isCompleted' property
     // TODO: Implement the ability to repeat tasks
-    // TODO: Implement custom alert dialogs 
+    // TODO: Implement custom alert dialogs
     // TODO: Implement animations
 
     return ListView(
       children: <Widget>[
-        SizedBox(height: 20.0,),
+        SizedBox(
+          height: 20.0,
+        ),
         // Header
         _buildTopHeader(database),
-        SizedBox(height: 20.0,),
+        SizedBox(
+          height: 20.0,
+        ),
         // Date timeline
         Container(
           // padding: EdgeInsets.symmetric(vertical: 10.0),
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blueGrey[100].withAlpha(150),
-                offset: Offset(0.0, 10.0),
-                blurRadius: 5.0
-              ),
-            ]
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.blueGrey[100].withAlpha(150),
+                    offset: Offset(0.0, 10.0),
+                    blurRadius: 5.0),
+              ]),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: _buildTimelineDay(),
           ),
         ),
-        SizedBox(height: 20.0,),
+        SizedBox(
+          height: 20.0,
+        ),
         _buildTasks(database),
-        SizedBox(height: 500.0,),
+        SizedBox(
+          height: 500.0,
+        ),
       ],
     );
   }
@@ -229,19 +226,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       children: <Widget>[
         // Top part
         Container(
-          // margin: EdgeInsets.symmetric(horizontal: 10.0),
-          // padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-          // decoration: BoxDecoration(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(10.0),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.black.withAlpha(150).withAlpha(50),
-          //       offset: Offset(0.0, 5.0),
-          //       blurRadius: 5.0
-          //     ),
-          //   ],
-          // ),
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
             children: <Widget>[
@@ -259,40 +243,52 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(
-                    "D",
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                      color: Colors.white,
-                    )
+                child: GestureDetector(
+                  onTap: () async {
+                    final auth = Provider.of<AuthBase>(context, listen: false);
+                    await auth.signOut();
+                  },
+                  child: Center(
+                    child: Text("D",
+                        style: Theme.of(context).textTheme.headline6.copyWith(
+                              color: Colors.white,
+                            )),
                   ),
                 ),
               ),
-              SizedBox(width: 10.0,),
+              SizedBox(
+                width: 10.0,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     "Hello, Daniil!",
                     style: Theme.of(context).textTheme.headline6.copyWith(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.w600,
-                      // color: Colors.white
-                      color: Colors.black.withAlpha(200)
-                    ),
+                        fontSize: 25.0,
+                        fontWeight: FontWeight.w600,
+                        // color: Colors.white
+                        color: Colors.black.withAlpha(200)),
                   ),
                   Text(
-                    (_tasksPerDay[DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)] ?? "No").toString()
-                    + 
-                    (_tasksPerDay[DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)] == 1
-                      ? " task today"
-                      : " tasks today"),
+                    (_tasksPerDay[DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day)] ??
+                                "No")
+                            .toString() +
+                        (_tasksPerDay[DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day)] ==
+                                1
+                            ? " task today"
+                            : " tasks today"),
                     style: Theme.of(context).textTheme.headline6.copyWith(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w300,
-                      // color: Colors.white
-                      color: Colors.black.withAlpha(150)
-                    ),
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w300,
+                        // color: Colors.white
+                        color: Colors.black.withAlpha(150)),
                   ),
                 ],
               ),
@@ -300,21 +296,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
         // Bottom part
-        SizedBox(height: 20.0,),
+        SizedBox(
+          height: 20.0,
+        ),
         Row(
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(left: 20.0),
-              child: Text(
-                "Categories",
-                style: Theme.of(context).textTheme.headline6.copyWith(
-                  color: Colors.black.withAlpha(200),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 25.0,
-                )
-              ),
+              child: Text("Categories",
+                  style: Theme.of(context).textTheme.headline6.copyWith(
+                        color: Colors.black.withAlpha(200),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 25.0,
+                      )),
             ),
-            SizedBox(width: 10.0,),
+            SizedBox(
+              width: 10.0,
+            ),
             GestureDetector(
               onTap: () {
                 model.updateShowCategories(!model.showCategories);
@@ -323,38 +321,43 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 duration: Duration(milliseconds: 100),
                 padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
                 decoration: BoxDecoration(
-                  color: model.showCategories ? Colors.red[400] : Colors.green[400],
+                  color: model.showCategories
+                      ? Colors.red[400]
+                      : Colors.green[400],
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 child: Text(
-                  model.showCategories? "Hide" : "Show",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
-                    color: Colors.white,
-                    fontSize: 10.0
-                  ),
+                  model.showCategories ? "Hide" : "Show",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(color: Colors.white, fontSize: 10.0),
                 ),
               ),
             ),
           ],
         ),
-        SizedBox(height: 20.0,),
-        if (model.showCategories)
-          _buildCategories(database),
-        SizedBox(height: 10.0,),
+        SizedBox(
+          height: 20.0,
+        ),
+        if (model.showCategories) _buildCategories(database),
+        SizedBox(
+          height: 10.0,
+        ),
         Row(
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(left: 20.0),
-              child: Text(
-                "Tasks",
-                style: Theme.of(context).textTheme.headline6.copyWith(
-                  color: Colors.black.withAlpha(200),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 25.0,
-                )
-              ),
+              child: Text("Tasks",
+                  style: Theme.of(context).textTheme.headline6.copyWith(
+                        color: Colors.black.withAlpha(200),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 25.0,
+                      )),
             ),
-            SizedBox(width: 10.0,),
+            SizedBox(
+              width: 10.0,
+            ),
             GestureDetector(
               onTap: () {
                 TasksPage.show(context, database);
@@ -367,10 +370,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 child: Text(
                   "View All",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
-                    color: Colors.white,
-                    fontSize: 10.0
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(color: Colors.white, fontSize: 10.0),
                 ),
               ),
             ),
@@ -392,44 +395,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     // DateTime end = currentDate.add(Duration(days: 7));
 
     for (int i = 0; i < 7; i++) {
-      dayWidgets.add(
-        new TimelineWidget(
-          onTap: () {
-            _animationController.reset();
-            _animationController.forward();
-          },
-          currentDate: currentDate,
-          model: model,
-          tasksPerDay: _tasksPerDay,
-        )
-      );
+      dayWidgets.add(new TimelineWidget(
+        onTap: () {
+          _animationController.reset();
+          _animationController.forward();
+        },
+        currentDate: currentDate,
+        model: model,
+        tasksPerDay: _tasksPerDay,
+      ));
       currentDate = currentDate.add(Duration(days: 1));
     }
 
     // print(_tasksPerDay.toString());
 
-
     return dayWidgets;
   }
 
-
   Widget _buildTasks(Database database) {
     return FadeTransition(
-      opacity: new Tween<double>(
-        begin: 0.25,
-        end: 1.0
-      ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
+      opacity: new Tween<double>(begin: 0.25, end: 1.0).animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
       child: ListView.builder(
-        shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          bool isFirst = true; // Prevents extra space between "Tasks" heading and actual tasks
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            bool isFirst =
+                true; // Prevents extra space between "Tasks" heading and actual tasks
 
-          // if (tasks[index].day != null && (isToday(tasks[index].day) || isTomorrow(tasks[index].day))) { // To show only today or tomorrow
+            // if (tasks[index].day != null && (isToday(tasks[index].day) || isTomorrow(tasks[index].day))) { // To show only today or tomorrow
 
-         
-            
             // if (isTomorrow(tasks[index].day)) isFirst = false; // Makes it so that we automatically start showing the extra space between date headings as soon as we reach "Tomorrow"
 
             return Column(
@@ -440,38 +436,41 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     position: new Tween<Offset>(
                       begin: const Offset(0.0, 0.5),
                       end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
+                    ).animate(CurvedAnimation(
+                        parent: _animationController, curve: Curves.easeIn)),
                     child: Row(
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(left: 20.0, top: isFirst ? 0.0 : 40.0),
-                          child: Text(
-                            _getDateHeader(model.selectedDate),
-                            style: Theme.of(context).textTheme.headline6.copyWith(
-                              color: Colors.black.withAlpha(150),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 20.0,
-                            )
-                          ),
+                          margin: EdgeInsets.only(
+                              left: 20.0, top: isFirst ? 0.0 : 40.0),
+                          child: Text(_getDateHeader(model.selectedDate),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(
+                                    color: Colors.black.withAlpha(150),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20.0,
+                                  )),
                         ),
                         // SizedBox(width: 10.0),
                         Spacer(),
                         GestureDetector(
-                          onTap: () {
-                          
-                          },
+                          onTap: () {},
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 10.0),
                             decoration: BoxDecoration(
                               color: Colors.indigo[400],
                               borderRadius: BorderRadius.circular(5.0),
                             ),
                             child: Text(
                               "Filter",
-                              style: Theme.of(context).textTheme.headline6.copyWith(
-                                color: Colors.white,
-                                fontSize: 15.0
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(
+                                      color: Colors.white, fontSize: 15.0),
                             ),
                           ),
                         ),
@@ -479,27 +478,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ],
                     ),
                   ),
-              if (tasks[index].day != null && isSameDay(model.selectedDate, tasks[index].day)) 
-                SlideTransition(
-                 position: new Tween<Offset>(
-                    begin: const Offset(0.0, 0.2),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
-                  child: FadeTransition(
-                     opacity: new Tween<double>(
-                        begin: 0.0,
-                        end: 1.0
-                      ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
-                    child: TaskWidget(task: tasks[index], database: database,)
-                  )
-                ),
+                if (tasks[index].day != null &&
+                    isSameDay(model.selectedDate, tasks[index].day))
+                  SlideTransition(
+                      position: new Tween<Offset>(
+                        begin: const Offset(0.0, 0.2),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                          parent: _animationController, curve: Curves.easeIn)),
+                      child: FadeTransition(
+                          opacity: new Tween<double>(begin: 0.0, end: 1.0)
+                              .animate(CurvedAnimation(
+                                  parent: _animationController,
+                                  curve: Curves.easeIn)),
+                          child: TaskWidget(
+                            task: tasks[index],
+                            database: database,
+                          ))),
               ],
             );
-          // return Container();
-        }
-      ),
+            // return Container();
+          }),
     );
-
   }
 
   /// Gets the custom date to show
@@ -519,47 +519,43 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget _buildCategories(Database database) {
     return StreamBuilder<List<Category>>(
-      stream: database.categoriesStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final categories = snapshot.data;
-          // No tasks added yet
-          if (categories.isEmpty) {
-            return Center(
-              // child: _buildNoCategoriesContainer(context)
+        stream: database.categoriesStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final categories = snapshot.data;
+            // No tasks added yet
+            if (categories.isEmpty) {
+              return Center(
+                  // child: _buildNoCategoriesContainer(context)
+                  );
+            }
+            // Data loaded and exists
+            return Column(
+              children: <Widget>[
+                Container(
+                  height: 200.0,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: categories.length + 1,
+                      itemBuilder: (context, index) {
+                        index = index - 1;
+                        if (index == -1) {
+                          return SizedBox(
+                            width: 30.0,
+                          );
+                        }
+                        return CategoryWidget(
+                            tasksPerCategory: _tasksPerCategory,
+                            category: categories[index],
+                            onTap: () => CategoryPage.create(context,
+                                category: categories[index]));
+                      }),
+                ),
+              ],
             );
           }
-          // Data loaded and exists
-          return Column(
-            children: <Widget>[
-              Container(
-                height: 200.0,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length + 1,
-                  itemBuilder: (context, index) {
-                    index = index - 1;
-                    if (index == -1) {
-                      return SizedBox(width: 30.0,);
-                    }
-                    return CategoryWidget(
-                      tasksPerCategory: _tasksPerCategory,
-                      category: categories[index], 
-                      onTap: () => CategoryPage.create(context, category: categories[index])
-                    );
-                  }
-                ),
-              ),
-            ],
-          );
-        }
-        // Loading state
-        return Center(
-          child: Container()
-        );
-      }
-    );
+          // Loading state
+          return Center(child: Container());
+        });
   }
-
-
 }

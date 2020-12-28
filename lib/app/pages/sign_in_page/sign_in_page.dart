@@ -7,7 +7,6 @@ import 'package:fari/services/auth.dart';
 import 'package:flutter/services.dart';
 
 class SignInPage extends StatelessWidget {
-
   const SignInPage({
     Key key,
     @required this.manager,
@@ -29,14 +28,20 @@ class SignInPage extends StatelessWidget {
     // The 'builder' method inside of a Consumer(...) gets rebuilt each time ValueNotifier.value changes; very similar to StreamBuilder
 
     // TODO: UNDERSTAND THIS _isLoading BUSINESS!
-    return ChangeNotifierProvider<ValueNotifier<bool>>( // Lets you create a ValueNotifier<bool> and lets you listen to it
-      create: (context) => ValueNotifier<bool>(false), // Create the boolean ValueNotifier with a default value
-      child: Consumer<ValueNotifier<bool>>( // Wrap the Provider in a Consumer (Consumer CONSUMES the boolean ValueNotifier)
-        builder: (context, isLoading, __) => Provider<SignInManager>( // Return the Provider
-          create: (context) => SignInManager(auth: auth, isLoading: isLoading), // Create the SignInManager
-          child: Consumer<SignInManager>( // Wrap the page in a Consumer (Consumer CONSUMES the SignInManager)
-            builder: (context, manager, _) => SignInPage(manager: manager, isLoading: isLoading.value)
-          ),
+    return ChangeNotifierProvider<ValueNotifier<bool>>(
+      // Lets you create a ValueNotifier<bool> and lets you listen to it
+      create: (context) => ValueNotifier<bool>(
+          false), // Create the boolean ValueNotifier with a default value
+      child: Consumer<ValueNotifier<bool>>(
+        // Wrap the Provider in a Consumer (Consumer CONSUMES the boolean ValueNotifier)
+        builder: (context, isLoading, __) => Provider<SignInManager>(
+          // Return the Provider
+          create: (context) => SignInManager(
+              auth: auth, isLoading: isLoading), // Create the SignInManager
+          child: Consumer<SignInManager>(
+              // Wrap the page in a Consumer (Consumer CONSUMES the SignInManager)
+              builder: (context, manager, _) =>
+                  SignInPage(manager: manager, isLoading: isLoading.value)),
         ),
       ),
     );
@@ -53,7 +58,7 @@ class SignInPage extends StatelessWidget {
   Future<void> _signInAnonymously(BuildContext context) async {
     try {
       await manager.signInAnonymously();
-    } on PlatformException catch(e) {
+    } on PlatformException catch (e) {
       _showSignInError(context, e);
     }
   }
@@ -61,7 +66,7 @@ class SignInPage extends StatelessWidget {
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
       await manager.signInWithGoogle();
-    } on PlatformException catch(e) {
+    } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         // If the user only exited out of the Google sign in prompt, we do NOT want to show an error
         _showSignInError(context, e);
@@ -70,22 +75,19 @@ class SignInPage extends StatelessWidget {
   }
 
   void _signInWithEmail(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+    Navigator.of(context).push(MaterialPageRoute<void>(
         fullscreenDialog: true,
-        builder: (BuildContext context) => EmailSignInPage()
-      )
-    );
+        builder: (BuildContext context) => EmailSignInPage()));
   }
-  
+
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: _buildContent(context),
     );
   }
- 
+
   Widget _buildContent(BuildContext context) {
     return Padding(
       // color: Colors.yellow,
@@ -94,10 +96,7 @@ class SignInPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          SizedBox(
-            height: 50.0,
-            child: _builderHeader(context)
-          ),
+          SizedBox(height: 50.0, child: _builderHeader(context)),
           SizedBox(height: 48.0),
           // Google sign in
           FlatButton(
@@ -110,21 +109,18 @@ class SignInPage extends StatelessWidget {
             onPressed: isLoading ? null : () => _signInWithEmail(context),
             child: Text('Sign in with email'),
           ),
-          SizedBox(height: 8.0),       
+          SizedBox(height: 8.0),
           Text(
             "or",
-            style: TextStyle(
-              fontSize: 14.0, 
-              color: Colors.black87
-            ),
+            style: TextStyle(fontSize: 14.0, color: Colors.black87),
             textAlign: TextAlign.center,
-          ),  
+          ),
           SizedBox(height: 8.0),
           // Anyonymous sign in
           FlatButton(
             onPressed: isLoading ? null : () => _signInAnonymously(context),
             child: Text('Go anonymous'),
-          ), 
+          ),
         ],
       ),
     );
@@ -139,11 +135,11 @@ class SignInPage extends StatelessWidget {
     return Text(
       'Sign In',
       textAlign: TextAlign.center,
-       style: Theme.of(context).textTheme.headline6.copyWith(
-        color: Colors.black,
-        fontSize: 32.0,
-        fontWeight: FontWeight.w600,
-      ),
+      style: Theme.of(context).textTheme.headline6.copyWith(
+            color: Colors.black,
+            fontSize: 32.0,
+            fontWeight: FontWeight.w600,
+          ),
     );
   }
 }
