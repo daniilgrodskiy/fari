@@ -35,7 +35,8 @@ class Auth implements AuthBase {
       return null;
     }
     return User(
-        uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl);
+      uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl
+    );
   }
 
   @override
@@ -84,8 +85,7 @@ class Auth implements AuthBase {
       googleAccount = await googleSignIn.signIn();
     } catch (e) {
       throw PlatformException(
-        code: 'ERROR LOGGING IN', message: 'There was an error logging in!'
-      );
+          code: 'ERROR LOGGING IN', message: 'There was an error logging in!');
     }
     if (googleAccount != null) {
       final GoogleSignInAuthentication googleAuth =

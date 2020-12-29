@@ -15,6 +15,7 @@ import 'package:fari/app/task_sort_methods.dart';
 import 'package:fari/services/auth.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -119,25 +120,32 @@ class _HomePageState extends State<HomePage>
             onTap: () => EditTaskPage.show(context),
           ),
           Positioned(
-            top: 20.0,
-            right: 10.0,
+            // top: 10.0,
+            // right: 10.0,
+            // bottom: MediaQuery.of(context).padding.bottom + 70.0,
+            // right: 10.0,
+            bottom: MediaQuery.of(context).padding.bottom,
+            right: 80.0,
             child: GestureDetector(
               onTap: () {
                 CalendarPage.show(context);
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                height: 60.0,
+                width: 60.0,
                 decoration: BoxDecoration(
-                  color: Colors.indigo[600],
-                  borderRadius: BorderRadius.circular(5.0),
+                  color: Colors.indigo[400],
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color:Colors.indigo.withAlpha(150),
+                      offset: Offset(0.0, 5.0),
+                      blurRadius: 10.0,
+                      spreadRadius: -2.0,
+                    ),
+                  ]
                 ),
-                child: Text(
-                  "Calendar",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6
-                      .copyWith(color: Colors.white, fontSize: 15.0),
-                ),
+                child: Icon(FontAwesomeIcons.calendarAlt, color: Colors.white,),
               ),
             ),
           ),
@@ -221,6 +229,8 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildTopHeader(Database database) {
+    final user = Provider.of<User>(context, listen: false);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -263,7 +273,7 @@ class _HomePageState extends State<HomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Hello, Daniil!",
+                    "Hello, " + (user.displayName ?? ""),
                     style: Theme.of(context).textTheme.headline6.copyWith(
                         fontSize: 25.0,
                         fontWeight: FontWeight.w600,
