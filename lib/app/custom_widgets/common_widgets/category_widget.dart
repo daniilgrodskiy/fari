@@ -1,15 +1,11 @@
-import 'package:fari/app/hext_color.dart';
+import 'package:fari/app/hex_color.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CategoryWidget extends StatelessWidget {
-
-  CategoryWidget({
-    @required this.category,
-    @required this.tasksPerCategory,
-    this.onTap
-  });
+  CategoryWidget(
+      {@required this.category, @required this.tasksPerCategory, this.onTap});
 
   final Category category;
   final Map<String, int> tasksPerCategory;
@@ -44,12 +40,12 @@ class CategoryWidget extends StatelessWidget {
                   child: Text(
                     category.name,
                     style: Theme.of(context).textTheme.headline6.copyWith(
-                      // color: HexColor(category.color),
-                      // color: Colors.black.withAlpha(200),
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15.0,
-                    ),
+                          // color: HexColor(category.color),
+                          // color: Colors.black.withAlpha(200),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15.0,
+                        ),
                   ),
                 ),
               ],
@@ -59,16 +55,17 @@ class CategoryWidget extends StatelessWidget {
               left: 10.0,
               child: Text(
                 (tasksPerCategory[category.id] ?? "No").toString() +
-                (tasksPerCategory[category.id] != null && tasksPerCategory[category.id] == 1
-                  ? " task" 
-                  : " tasks"),
+                    (tasksPerCategory[category.id] != null &&
+                            tasksPerCategory[category.id] == 1
+                        ? " task"
+                        : " tasks"),
                 style: Theme.of(context).textTheme.headline6.copyWith(
-                  // color: HexColor(category.color),
-                  // color: Colors.black.withAlpha(200),
-                  color: Colors.white.withAlpha(220),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 10.0,
-                ),
+                      // color: HexColor(category.color),
+                      // color: Colors.black.withAlpha(200),
+                      color: Colors.white.withAlpha(220),
+                      fontWeight: FontWeight.w300,
+                      fontSize: 10.0,
+                    ),
               ),
             ),
             // If the category is selected inside of 'EditTaskPage(...)'

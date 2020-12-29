@@ -430,12 +430,15 @@ class _HomePageState extends State<HomePage>
           physics: ClampingScrollPhysics(),
           itemCount: tasks.length,
           itemBuilder: (context, index) {
-            bool isFirst =
-                true; // Prevents extra space between "Tasks" heading and actual tasks
+            bool isFirst = index ==
+                0; // Prevents extra space between "Tasks" heading and actual tasks
             return Column(
               children: <Widget>[
-                // if (index == 0 || tasks[index - 1].day.day != tasks[index].day.day)
-                if (index == 0)
+                if (index == 0 ||
+                    (index != 0 &&
+                        tasks[index - 1].day != null &&
+                        tasks[index].day ==
+                            null)) // First time we're showing a task with no deadline))
                   SlideTransition(
                     position: new Tween<Offset>(
                       begin: const Offset(0.0, 0.5),
@@ -446,8 +449,11 @@ class _HomePageState extends State<HomePage>
                       children: <Widget>[
                         Container(
                           margin: EdgeInsets.only(
-                              left: 20.0, top: isFirst ? 0.0 : 40.0),
-                          child: Text(_getDateHeader(model.selectedDate),
+                              left: 20.0, top: index == 0 ? 0.0 : 40.0),
+                          child: Text(
+                              index == 0
+                                  ? _getDateHeader(model.selectedDate) + ":"
+                                  : "No deadline:",
                               style: Theme.of(context)
                                   .textTheme
                                   .headline6
@@ -459,61 +465,27 @@ class _HomePageState extends State<HomePage>
                         ),
                         // SizedBox(width: 10.0),
                         Spacer(),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.indigo[400],
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Text(
-                              "Filter",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  .copyWith(
-                                      color: Colors.white, fontSize: 15.0),
+                        if (isFirst)
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 10.0),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo[400],
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: Text(
+                                "Filter",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    .copyWith(
+                                        color: Colors.white, fontSize: 15.0),
+                              ),
                             ),
                           ),
-                        ),
                         SizedBox(width: 20.0),
-                      ],
-                    ),
-                  ),
-                if (index != 0 &&
-                    tasks[index - 1].day != null &&
-                    tasks[index].day ==
-                        null) // First time we're showing a task with no deadline
-                  SlideTransition(
-                    position: new Tween<Offset>(
-                      begin: const Offset(0.0, 0.5),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                        parent: _animationController, curve: Curves.easeIn)),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 30.0,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 20.0, top: isFirst ? 0.0 : 40.0),
-                              child: Text("No deadline",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline6
-                                      .copyWith(
-                                        color: Colors.black.withAlpha(150),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20.0,
-                                      )),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),

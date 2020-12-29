@@ -4,7 +4,7 @@ import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/top_bar/search_bar.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar_button.dart';
-import 'package:fari/app/hext_color.dart';
+import 'package:fari/app/hex_color.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/category_page/category_page_model.dart';

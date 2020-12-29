@@ -2,7 +2,7 @@ import 'package:fari/app/custom_widgets/common_widgets/custom_text_field.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_exception_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
-import 'package:fari/app/hext_color.dart';
+import 'package:fari/app/hex_color.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/pages/edit_category_page/edit_category_page_model.dart';
 import 'package:fari/services/database.dart';
@@ -12,69 +12,73 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class EditCategoryPage extends StatefulWidget {
-
   final Category category;
   final Database database;
   final EditCategoryPageModel model;
 
   const EditCategoryPage({
-     this.category,
-     @required this.database, 
-     @required this.model,
+    this.category,
+    @required this.database,
+    @required this.model,
   });
 
-  static Future<void> show(BuildContext context, {Category category, Database database}) async {
+  static Future<void> show(BuildContext context,
+      {Category category, Database database}) async {
     // Returning 'bool' because we want to give feedback to whether or not the category has been deleted (if Navigator ever returns true, then the category has been deleted)
     // IMPORTANT: When navigating from a page that came from the MaterialPage (EditTaskPage -> EditCategoryPage), Database cannot be retrieved via a Provider and MUST be passed in because it no longer exists as an ancestor of the page
     if (database == null) {
       database = Provider.of<Database>(context, listen: false);
     }
 
-    await Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        fullscreenDialog: true, // slides from the bottom
-        builder: (context) => 
-          ChangeNotifierProvider<EditCategoryPageModel>(
-            create: (context) {
-              if (category == null) {
-                // New category
-                return new EditCategoryPageModel(database: database,);
-              }
-              return new EditCategoryPageModel(
-                  database: database,
-                  id: category.id,
-                  name: category.name,
-                  color: category.color
-                );
-            },
-            child: Consumer<EditCategoryPageModel>(
-              builder: (context, model, _)  =>
-                EditCategoryPage(
-                  category: category, 
-                  database: database,
-                  model: model,
-                ),
-            ),
+    await Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+      fullscreenDialog: true, // slides from the bottom
+      builder: (context) => ChangeNotifierProvider<EditCategoryPageModel>(
+        create: (context) {
+          if (category == null) {
+            // New category
+            return new EditCategoryPageModel(
+              database: database,
+            );
+          }
+          return new EditCategoryPageModel(
+              database: database,
+              id: category.id,
+              name: category.name,
+              color: category.color);
+        },
+        child: Consumer<EditCategoryPageModel>(
+          builder: (context, model, _) => EditCategoryPage(
+            category: category,
+            database: database,
+            model: model,
           ),
-      )
-    );
+        ),
+      ),
+    ));
   }
-  
+
   @override
   _EditCategoryPageState createState() => _EditCategoryPageState();
 }
 
 class _EditCategoryPageState extends State<EditCategoryPage> {
-
   /// Instance variables
 
   final _nameController = TextEditingController();
   final _categoryColors = [
-    "1abc9c", "2ecc71" , "3498db", "9b59b6", "34495e", "f1c40f", "e67e22", "e74c3c", "95a5a6",
+    "1abc9c",
+    "2ecc71",
+    "3498db",
+    "9b59b6",
+    "34495e",
+    "f1c40f",
+    "e67e22",
+    "e74c3c",
+    "95a5a6",
   ];
 
   /// Getter methods
-  
+
   Category get category => widget.category;
   EditCategoryPageModel get model => widget.model;
 
@@ -91,25 +95,27 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
   }
 
   //// Service methods
-  
+
   Future<void> _submit() async {
     // Called when the form is submitted
     try {
       await model.submit();
       Navigator.of(context).pop();
-    } on PlatformException catch(e) {
+    } on PlatformException catch (e) {
       // Shows the error in a PlatfrormAlertExceptionDialog (which extends PlatformAlertDialog); will be rethrown from the 'submit()' method inside of our bloc
 
       // IMPORTANT: Don't forget to always change 'isLoading' back to false after throwing an error!
       model.updateWith(isLoading: false);
       PlatformExceptionAlertDialog(
-        title: category == null ? "Unable to create new category 😞" : "Unable to save category 😞",
+        title: category == null
+            ? "Unable to create new category 😞"
+            : "Unable to save category 😞",
         exception: e,
       ).show(context);
     }
   }
 
-   Future<void> _delete(Category category) async {
+  Future<void> _delete(Category category) async {
     // Called when user wants to delete a task
     try {
       bool isQuitting = await PlatformAlertDialog(
@@ -124,7 +130,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
         // Pop twice???
         Navigator.of(context).pop();
       }
-    } on PlatformException catch(e) {
+    } on PlatformException catch (e) {
       model.updateWith(isLoading: false);
       PlatformExceptionAlertDialog(
         title: "Unable to delete category 😞",
@@ -134,7 +140,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
   }
 
   /// BUILD METHOD
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -148,18 +154,22 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
             children: <Widget>[
               ListView(
                 children: <Widget>[
-                  SizedBox(height: 30.0,),
+                  SizedBox(
+                    height: 30.0,
+                  ),
                   _buildHeading(),
-                  SizedBox(height: 20.0,),
+                  SizedBox(
+                    height: 20.0,
+                  ),
                   _buildForm(),
-                  if (category != null)
-                    _buildDeleteButton(),
-                  SizedBox(height: 150.0,),
+                  if (category != null) _buildDeleteButton(),
+                  SizedBox(
+                    height: 150.0,
+                  ),
                 ],
               ),
               _buildSubmitButton(),
               _buildExitButton(),
-              
             ],
           ),
         ),
@@ -175,7 +185,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
       right: 20.0,
       top: 20.0,
       child: GestureDetector(
-        onTap: () async { 
+        onTap: () async {
           // TODO: Uncomment this part and only show dialog if it's a created category that's been altered (we'd check once we put this top bar in a separate class and pass in "model")
           // bool isQuitting =  await PlatformAlertDialog(
           //   title: "Are you want to quit?",
@@ -185,7 +195,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           // ).show(context);
 
           // if (isQuitting)
-            Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         child: Container(
           height: 50.0,
@@ -194,22 +204,27 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
             color: Colors.grey.withAlpha(150),
             shape: BoxShape.circle,
           ),
-          child: Icon(FontAwesomeIcons.times, color: Colors.white,),
+          child: Icon(
+            FontAwesomeIcons.times,
+            color: Colors.white,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHeading() {
-     return Container(
+    return Container(
       margin: EdgeInsets.only(left: 20.0),
       child: Text(
-        category?.name == null || category?.name == "" ? "New category" : category.name,
+        category?.name == null || category?.name == ""
+            ? "New category"
+            : category.name,
         style: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.indigo,
-          fontWeight: FontWeight.w700,
-          fontSize: 25.0,
-        ),
+              color: Colors.indigo,
+              fontWeight: FontWeight.w700,
+              fontSize: 25.0,
+            ),
       ),
     );
   }
@@ -220,10 +235,10 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.black.withAlpha(200),
-          fontSize: 20.0,
-          fontWeight: FontWeight.w500,
-        ),
+              color: Colors.black.withAlpha(200),
+              fontSize: 20.0,
+              fontWeight: FontWeight.w500,
+            ),
       ),
     );
   }
@@ -244,12 +259,13 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           maxLines: 3,
           onChanged: model.updateName,
         ),
-        SizedBox(height: 40.0,),
+        SizedBox(
+          height: 40.0,
+        ),
         _buildColors(),
       ],
     );
   }
-
 
   Widget _buildColors() {
     return Container(
@@ -260,17 +276,14 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           // Actual colors
           Container(
             child: GridView.count(
-              padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 50.0),
-              physics: ClampingScrollPhysics(),
-              shrinkWrap: true,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 10,
-              crossAxisCount: 5,
-              children: List.generate(
-                _categoryColors.length, 
-                (index) => _buildColorWidget(index)                
-              )
-            ),
+                padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 50.0),
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 10,
+                crossAxisCount: 5,
+                children: List.generate(_categoryColors.length,
+                    (index) => _buildColorWidget(index))),
           ),
         ],
       ),
@@ -288,43 +301,44 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           color: HexColor(_categoryColors[index]),
           boxShadow: [
             BoxShadow(
-              color: HexColor(_categoryColors[index]).withAlpha(100),
-              offset: Offset(0.0, 10.0),
-              spreadRadius: -5.0,
-              blurRadius: 5.0
-            ),
+                color: HexColor(_categoryColors[index]).withAlpha(100),
+                offset: Offset(0.0, 10.0),
+                spreadRadius: -5.0,
+                blurRadius: 5.0),
           ],
           // shape: BoxShape.circle,
         ),
         child: isSelected
-          ? Container(       
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.green[100],
-                    // borderRadius: BorderRadius.circular(5.0),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green[800].withAlpha(100),
-                        offset: Offset(0.0, 6.0),
-                        blurRadius: 5.0,
-                        spreadRadius: -3.0,
-                      ),
-                    ]
+            ? Container(
+                child: Center(
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        // borderRadius: BorderRadius.circular(5.0),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green[800].withAlpha(100),
+                            offset: Offset(0.0, 6.0),
+                            blurRadius: 5.0,
+                            spreadRadius: -3.0,
+                          ),
+                        ]),
+                    child: Icon(
+                      FontAwesomeIcons.check,
+                      color: Colors.green[400],
+                      size: 20,
+                    ),
                   ),
-                  child: Icon(FontAwesomeIcons.check, color: Colors.green[400], size: 20,),
                 ),
-              ),
-            )
-          : Container(),
+              )
+            : Container(),
       ),
     );
   }
 
-
-   Widget _buildSubmitButton() {
+  Widget _buildSubmitButton() {
     return Positioned(
       bottom: 20.0,
       left: 20.0,
@@ -334,17 +348,15 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           onTap: _submit,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.indigo[400],
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.indigo[400].withAlpha(200),
-                  offset: Offset(0.0, 5.0),
-                  blurRadius: 15.0,
-                  spreadRadius: -5.0
-                ),
-              ]
-            ),
+                color: Colors.indigo[400],
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.indigo[400].withAlpha(200),
+                      offset: Offset(0.0, 5.0),
+                      blurRadius: 15.0,
+                      spreadRadius: -5.0),
+                ]),
             padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
             margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
             child: Center(
@@ -353,10 +365,10 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                 // If the passed in category exists -> we're editing a category
                 category == null ? "Create category" : "Save category",
                 style: Theme.of(context).textTheme.headline6.copyWith(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w400,
-                ),
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w400,
+                    ),
               ),
             ),
             // child: Icon(FontAwesomeIcons.check, color: Colors.white,),
@@ -372,27 +384,25 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
         onTap: () => _delete(category),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.red[300],
-            borderRadius: BorderRadius.circular(10.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.red[300].withAlpha(200),
-                offset: Offset(0.0, 5.0),
-                blurRadius: 15.0,
-                spreadRadius: -5.0
-              ),
-            ]
-          ),
+              color: Colors.red[300],
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.red[300].withAlpha(200),
+                    offset: Offset(0.0, 5.0),
+                    blurRadius: 15.0,
+                    spreadRadius: -5.0),
+              ]),
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
           margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Center(
             child: Text(
               "Delete category",
-                style: Theme.of(context).textTheme.headline6.copyWith(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.w400,
-              ),
+              style: Theme.of(context).textTheme.headline6.copyWith(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w400,
+                  ),
             ),
           ),
         ),
@@ -406,5 +416,4 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
       child: Center(child: CircularProgressIndicator()),
     );
   }
-
 }
