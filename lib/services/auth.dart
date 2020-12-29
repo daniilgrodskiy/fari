@@ -34,9 +34,10 @@ class Auth implements AuthBase {
     if (user == null) {
       return null;
     }
+
+    print(user.displayName);
     return User(
-      uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl
-    );
+        uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl);
   }
 
   @override

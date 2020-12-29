@@ -134,18 +134,20 @@ class _HomePageState extends State<HomePage>
                 height: 60.0,
                 width: 60.0,
                 decoration: BoxDecoration(
-                  color: Colors.indigo[400],
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color:Colors.indigo.withAlpha(150),
-                      offset: Offset(0.0, 5.0),
-                      blurRadius: 10.0,
-                      spreadRadius: -2.0,
-                    ),
-                  ]
+                    color: Colors.indigo[400],
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.indigo.withAlpha(150),
+                        offset: Offset(0.0, 5.0),
+                        blurRadius: 10.0,
+                        spreadRadius: -2.0,
+                      ),
+                    ]),
+                child: Icon(
+                  FontAwesomeIcons.calendarAlt,
+                  color: Colors.white,
                 ),
-                child: Icon(FontAwesomeIcons.calendarAlt, color: Colors.white,),
               ),
             ),
           ),
@@ -238,73 +240,108 @@ class _HomePageState extends State<HomePage>
         Container(
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
-            children: <Widget>[
-              Container(
-                height: 50.0,
-                width: 50.0,
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[800],
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(50),
-                      offset: Offset(0.0, 5.0),
-                      blurRadius: 5.0,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final auth = Provider.of<AuthBase>(context, listen: false);
+                  await auth.signOut();
+                },
+                child: Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(user.photoUrl),
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(50),
+                        offset: Offset(0.0, 5.0),
+                        blurRadius: 5.0,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 10.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          "Hello, " + (user.displayName.split(" ")[0] ?? ""),
+                          style: Theme.of(context).textTheme.headline6.copyWith(
+                              fontSize: 25.0,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black.withAlpha(200)),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      (_tasksPerDay[DateTime(
+                                      DateTime.now().year,
+                                      DateTime.now().month,
+                                      DateTime.now().day)] ??
+                                  "No")
+                              .toString() +
+                          (_tasksPerDay[DateTime(
+                                      DateTime.now().year,
+                                      DateTime.now().month,
+                                      DateTime.now().day)] ==
+                                  1
+                              ? " task today"
+                              : " tasks today"),
+                      style: Theme.of(context).textTheme.headline6.copyWith(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.w300,
+                          // color: Colors.white
+                          color: Colors.black.withAlpha(150)),
                     ),
                   ],
                 ),
-                child: GestureDetector(
-                  onTap: () async {
-                    final auth = Provider.of<AuthBase>(context, listen: false);
-                    await auth.signOut();
-                  },
-                  child: Center(
-                    child: Text("D",
-                        style: Theme.of(context).textTheme.headline6.copyWith(
-                              color: Colors.white,
-                            )),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Hello, " + (user.displayName ?? ""),
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.w600,
-                        // color: Colors.white
-                        color: Colors.black.withAlpha(200)),
-                  ),
-                  Text(
-                    (_tasksPerDay[DateTime(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day)] ??
-                                "No")
-                            .toString() +
-                        (_tasksPerDay[DateTime(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day)] ==
-                                1
-                            ? " task today"
-                            : " tasks today"),
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w300,
-                        // color: Colors.white
-                        color: Colors.black.withAlpha(150)),
-                  ),
-                ],
               ),
             ],
           ),
         ),
+        // Container(
+        //   margin: EdgeInsets.symmetric(horizontal: 20.0),
+        //   child: Row(
+        //     children: <Widget>[
+        //       SizedBox(
+        //         width: 10.0,
+        //       ),
+        //       Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: <Widget>[
+        //           Text(
+        //             (_tasksPerDay[DateTime(
+        //                             DateTime.now().year,
+        //                             DateTime.now().month,
+        //                             DateTime.now().day)] ??
+        //                         "No")
+        //                     .toString() +
+        //                 (_tasksPerDay[DateTime(
+        //                             DateTime.now().year,
+        //                             DateTime.now().month,
+        //                             DateTime.now().day)] ==
+        //                         1
+        //                     ? " task today"
+        //                     : " tasks today"),
+        //             style: Theme.of(context).textTheme.headline6.copyWith(
+        //                 fontSize: 15.0,
+        //                 fontWeight: FontWeight.w300,
+        //                 // color: Colors.white
+        //                 color: Colors.black.withAlpha(150)),
+        //           ),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
         // Bottom part
         SizedBox(
           height: 20.0,
