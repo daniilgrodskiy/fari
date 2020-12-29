@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../hex_color.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TaskWidget extends StatefulWidget {
   TaskWidget({
@@ -50,40 +51,58 @@ class _TaskWidgetState extends State<TaskWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Slideabl(
-      background: Container(
-        decoration: BoxDecoration(
-            color: Colors.red[400], borderRadius: BorderRadius.circular(20.0)),
-        margin: EdgeInsets.all(20.0),
-      ),
+    return Slidable(
+      actionExtentRatio: 0.0,
+      // direction: DismissDirection.endToStart,
       key: Key(task.id),
-      onDismissed: (direction) {
-        final database = Provider.of<Database>(context, listen: false);
-        try {
-          database.deleteTask(task);
-          Scaffold.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              duration: Duration(seconds: 5),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.red[400],
-              content: Text("\"${task.name}\" has been deleted"),
-              margin: EdgeInsets.all(10.0),
-            ));
-        } catch (e) {
-          Scaffold.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              duration: Duration(seconds: 5),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.red[400],
-              content: Text("Error: \"${task.name}\" was not deleted."),
-              margin: EdgeInsets.all(10.0),
-            ));
-        }
-      },
+      actionPane: SlidableScrollActionPane(),
+      closeOnScroll: false,
+      secondaryActions: [
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 10.0),
+          padding: EdgeInsets.only(left: 20.0),
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+              color: Colors.red[400],
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  bottomLeft: Radius.circular(20.0))),
+          child: Icon(
+            FontAwesomeIcons.trashAlt,
+            color: Colors.white,
+          ),
+        ),
+      ],
+      dismissal: SlidableDismissal(
+        child: SlidableDrawerDismissal(),
+        onDismissed: (actionType) {
+          final database = Provider.of<Database>(context, listen: false);
+          try {
+            database.deleteTask(task);
+            Scaffold.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                duration: Duration(seconds: 5),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red[400],
+                content: Text("\"${task.name}\" has been deleted"),
+                margin: EdgeInsets.all(10.0),
+              ));
+          } catch (e) {
+            Scaffold.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                duration: Duration(seconds: 5),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red[400],
+                content: Text("Error: \"${task.name}\" was not deleted."),
+                margin: EdgeInsets.all(10.0),
+              ));
+          }
+        },
+      ),
       child: AnimatedBuilder(
           animation: _animation,
           builder: (context, child) {

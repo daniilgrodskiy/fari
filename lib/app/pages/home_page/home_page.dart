@@ -1,6 +1,7 @@
 import 'package:fari/app/custom_widgets/common_widgets/add_button.dart';
 import 'package:fari/app/custom_widgets/common_widgets/category_widget.dart';
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
+import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
 import 'package:fari/app/custom_widgets/useful_time_methods.dart';
 import 'package:fari/app/models/category.dart';
@@ -238,27 +239,21 @@ class _HomePageState extends State<HomePage>
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () async {
-                  final auth = Provider.of<AuthBase>(context, listen: false);
-                  await auth.signOut();
-                },
-                child: Container(
-                  height: 50.0,
-                  width: 50.0,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(user.photoUrl),
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(50),
-                        offset: Offset(0.0, 5.0),
-                        blurRadius: 5.0,
-                      ),
-                    ],
+              Container(
+                height: 50.0,
+                width: 50.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(user.photoUrl),
                   ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(50),
+                      offset: Offset(0.0, 5.0),
+                      blurRadius: 5.0,
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: 10.0),
@@ -301,6 +296,40 @@ class _HomePageState extends State<HomePage>
                   ],
                 ),
               ),
+              GestureDetector(
+                onTap: () async {
+                  bool signOut = await PlatformAlertDialog(
+                    title: "Are you want to sign out?",
+                    content: "",
+                    defaultActionText: "Yes",
+                    cancelActionText: "No",
+                  ).show(context);
+                  if (signOut) {
+                    final auth = Provider.of<AuthBase>(context, listen: false);
+                    await auth.signOut();
+                  }
+                },
+                child: Container(
+                  height: 40.0,
+                  width: 40.0,
+                  decoration: BoxDecoration(
+                      color: Colors.indigo[300],
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.indigo.withAlpha(150),
+                          offset: Offset(0.0, 3.0),
+                          blurRadius: 5.0,
+                          spreadRadius: -2.0,
+                        ),
+                      ]),
+                  child: Icon(
+                    FontAwesomeIcons.signOutAlt,
+                    color: Colors.white,
+                    size: 15.0,
+                  ),
+                ),
+              )
             ],
           ),
         ),
