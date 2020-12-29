@@ -119,39 +119,39 @@ class _HomePageState extends State<HomePage>
           AddButton(
             onTap: () => EditTaskPage.show(context),
           ),
-          Positioned(
-            // top: 10.0,
-            // right: 10.0,
-            // bottom: MediaQuery.of(context).padding.bottom + 70.0,
-            // right: 10.0,
-            bottom: MediaQuery.of(context).padding.bottom,
-            right: 80.0,
-            child: GestureDetector(
-              onTap: () {
-                CalendarPage.show(context);
-              },
-              child: Container(
-                height: 60.0,
-                width: 60.0,
-                decoration: BoxDecoration(
-                    color: Colors.indigo[400],
-                    borderRadius: BorderRadius.circular(20.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.indigo.withAlpha(150),
-                        offset: Offset(0.0, 5.0),
-                        blurRadius: 10.0,
-                        spreadRadius: -2.0,
-                      ),
-                    ]),
-                child: Icon(
-                  FontAwesomeIcons.calendarAlt,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+          _buildCalendarButton(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarButton() {
+    return Positioned(
+      bottom: MediaQuery.of(context).padding.bottom,
+      right: 80.0,
+      child: GestureDetector(
+        onTap: () {
+          CalendarPage.show(context);
+        },
+        child: Container(
+          height: 60.0,
+          width: 60.0,
+          decoration: BoxDecoration(
+              color: Colors.indigo[400],
+              borderRadius: BorderRadius.circular(20.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withAlpha(150),
+                  offset: Offset(0.0, 5.0),
+                  blurRadius: 10.0,
+                  spreadRadius: -2.0,
+                ),
+              ]),
+          child: Icon(
+            FontAwesomeIcons.calendarAlt,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -184,9 +184,6 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildContent(BuildContext context, Database database) {
-    // TODO: Have the dates show up by heading via "Today", "Tomorrow", "Saturday", ""
-    // TODO: Figure out how to handle showing time
-    // TODO: Implement a 'swipe to complete' system and add a 'isCompleted' property
     // TODO: Implement the ability to repeat tasks
     // TODO: Implement custom alert dialogs
     // TODO: Implement animations
@@ -307,41 +304,6 @@ class _HomePageState extends State<HomePage>
             ],
           ),
         ),
-        // Container(
-        //   margin: EdgeInsets.symmetric(horizontal: 20.0),
-        //   child: Row(
-        //     children: <Widget>[
-        //       SizedBox(
-        //         width: 10.0,
-        //       ),
-        //       Column(
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: <Widget>[
-        //           Text(
-        //             (_tasksPerDay[DateTime(
-        //                             DateTime.now().year,
-        //                             DateTime.now().month,
-        //                             DateTime.now().day)] ??
-        //                         "No")
-        //                     .toString() +
-        //                 (_tasksPerDay[DateTime(
-        //                             DateTime.now().year,
-        //                             DateTime.now().month,
-        //                             DateTime.now().day)] ==
-        //                         1
-        //                     ? " task today"
-        //                     : " tasks today"),
-        //             style: Theme.of(context).textTheme.headline6.copyWith(
-        //                 fontSize: 15.0,
-        //                 fontWeight: FontWeight.w300,
-        //                 // color: Colors.white
-        //                 color: Colors.black.withAlpha(150)),
-        //           ),
-        //         ],
-        //       ),
-        //     ],
-        //   ),
-        // ),
         // Bottom part
         SizedBox(
           height: 20.0,
