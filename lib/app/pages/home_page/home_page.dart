@@ -290,8 +290,8 @@ class _HomePageState extends State<HomePage>
                                       DateTime.now().month,
                                       DateTime.now().day)] ==
                                   1
-                              ? " task today"
-                              : " tasks today"),
+                              ? " task due today"
+                              : " tasks due today"),
                       style: Theme.of(context).textTheme.headline6.copyWith(
                           fontSize: 15.0,
                           fontWeight: FontWeight.w300,
@@ -432,11 +432,6 @@ class _HomePageState extends State<HomePage>
           itemBuilder: (context, index) {
             bool isFirst =
                 true; // Prevents extra space between "Tasks" heading and actual tasks
-
-            // if (tasks[index].day != null && (isToday(tasks[index].day) || isTomorrow(tasks[index].day))) { // To show only today or tomorrow
-
-            // if (isTomorrow(tasks[index].day)) isFirst = false; // Makes it so that we automatically start showing the extra space between date headings as soon as we reach "Tomorrow"
-
             return Column(
               children: <Widget>[
                 // if (index == 0 || tasks[index - 1].day.day != tasks[index].day.day)
@@ -487,8 +482,45 @@ class _HomePageState extends State<HomePage>
                       ],
                     ),
                   ),
-                if (tasks[index].day != null &&
-                    isSameDay(model.selectedDate, tasks[index].day))
+                if (index != 0 &&
+                    tasks[index - 1].day != null &&
+                    tasks[index].day ==
+                        null) // First time we're showing a task with no deadline
+                  SlideTransition(
+                    position: new Tween<Offset>(
+                      begin: const Offset(0.0, 0.5),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                        parent: _animationController, curve: Curves.easeIn)),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 30.0,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(
+                                  left: 20.0, top: isFirst ? 0.0 : 40.0),
+                              child: Text("No deadline",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6
+                                      .copyWith(
+                                        color: Colors.black.withAlpha(150),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20.0,
+                                      )),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                if ((tasks[index].day != null &&
+                        isSameDay(model.selectedDate, tasks[index].day)) ||
+                    tasks[index].day ==
+                        null) // Show tasks due today and no deadline tasks
                   SlideTransition(
                       position: new Tween<Offset>(
                         begin: const Offset(0.0, 0.2),
@@ -506,7 +538,6 @@ class _HomePageState extends State<HomePage>
                           ))),
               ],
             );
-            // return Container();
           }),
     );
   }
