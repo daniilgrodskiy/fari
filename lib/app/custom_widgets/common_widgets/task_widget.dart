@@ -283,7 +283,8 @@ class _TaskWidgetState extends State<TaskWidget>
               // Doing this just in case we type something and delete it after; we don't want to save an an empty ("") categoryId or description into the database
               day: task.day,
               time: task.time,
-              isCompleted: !task.isCompleted);
+              isCompleted: !task.isCompleted,
+              hasReminder: task.hasReminder);
 
           await widget.database.setTask(savedTask);
         } catch (e) {

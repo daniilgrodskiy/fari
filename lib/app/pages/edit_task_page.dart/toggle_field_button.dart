@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ToggleFieldButton extends StatelessWidget {
-  ToggleFieldButton(this.isEnabled, this.onTap);
+  ToggleFieldButton(
+      this.isEnabled, this.onTap, this.enabledText, this.disabledText);
 
   final bool isEnabled;
   final VoidCallback onTap;
+  final String enabledText;
+  final String disabledText;
 
   /// build method
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -23,11 +26,11 @@ class ToggleFieldButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: Text(
-           isEnabled ? "Hide" : "Show",
-          style: Theme.of(context).textTheme.headline6.copyWith(
-            color: Colors.white,
-            fontSize: 10.0
-          ),
+          isEnabled ? enabledText : disabledText,
+          style: Theme.of(context)
+              .textTheme
+              .headline6
+              .copyWith(color: Colors.white, fontSize: 10.0),
         ),
       ),
     );

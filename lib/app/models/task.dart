@@ -12,7 +12,8 @@ class Task implements EventInterface {
       this.description,
       this.day,
       this.time,
-      this.isCompleted});
+      this.isCompleted,
+      this.hasReminder});
 
   final String id;
   final String name;
@@ -21,6 +22,7 @@ class Task implements EventInterface {
   final DateTime day;
   final DateTime time;
   final bool isCompleted;
+  final bool hasReminder;
 
   // When connecting to a db, this is the format that the data comes back in
   factory Task.fromMap(Map<dynamic, dynamic> dataMap, String documentId) {
@@ -34,6 +36,7 @@ class Task implements EventInterface {
       day: dataMap["day"] != null ? DateTime.parse(dataMap["day"]) : null,
       time: dataMap["time"] != null ? DateTime.parse(dataMap["time"]) : null,
       isCompleted: dataMap["isCompleted"] ?? false,
+      hasReminder: dataMap["hasReminder"] ?? false,
     );
   }
 
@@ -70,6 +73,11 @@ class Task implements EventInterface {
           ifAbsent: () => this.isCompleted);
     }
 
+    if (this.hasReminder != null) {
+      dataMap.update("hasReminder", (value) => {value = this.hasReminder},
+          ifAbsent: () => this.hasReminder);
+    }
+    
     return dataMap;
   }
 

@@ -21,73 +21,67 @@ abstract class Database {
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
 
 class FirestoreDatabase implements Database {
-  FirestoreDatabase({
-    @required this.uid
-  }) : assert(uid != null);
-  
+  FirestoreDatabase({@required this.uid}) : assert(uid != null);
+
   final String uid;
 
   final _service = FirestoreService.instance;
 
   // TASK METHODS
-   @override
+  @override
   Stream<Task> taskStream({@required String taskId}) {
     // Might not be clear that we want type 'String' and NOT category, so we're gonna make it a named, but REQUIRED parameter
 
     // TODO: Might want to combine streams!
     return _service.documentStream(
-      path: APIPath.task(uid, taskId),
-      builder: (data, documentId) =>
-        Task.fromMap(data, documentId)
-    );
-
+        path: APIPath.task(uid, taskId),
+        builder: (data, documentId) => Task.fromMap(data, documentId));
   }
 
   @override
   Stream<List<Task>> tasksStream({String categoryId, String search}) =>
-    _service.collectionStream(
-      queryBuilder: 
-        categoryId != null
-          ? (query) => query.where('categoryId', isEqualTo: categoryId)
-          : null,
-      path: APIPath.tasks(uid),
-      builder: (data, documentId) => Task.fromMap(data, documentId),
-    );
+      _service.collectionStream(
+        queryBuilder: categoryId != null
+            ? (query) => query.where('categoryId', isEqualTo: categoryId)
+            : null,
+        path: APIPath.tasks(uid),
+        builder: (data, documentId) => Task.fromMap(data, documentId),
+      );
 
   @override
-  Future<void> setTask(Task task) async => 
-    await _service.setData(
-      path: APIPath.task(uid, task.id),
-      data: task.toMap(),
-    );
+  Future<void> setTask(Task task) async => await _service.setData(
+        path: APIPath.task(uid, task.id),
+        data: task.toMap(),
+        // TODO: If task.hasReminder, add it to 'reminders'
+        // TODO: Check and compare old value of 'hasReminder'
+        // -> find old and
+        //  -> if not found then add new
+        //  -> if found, then edit it to either say 'cancelled' or delete it altogether
+      );
 
   @override
   Future<void> deleteTask(Task task) async =>
-    await _service.deleteData(path: APIPath.task(uid, task.id));
- 
+      await _service.deleteData(path: APIPath.task(uid, task.id));
+
   // CATEGORY METHODS
   @override
-  Stream<Category> categoryStream({@required String categoryId}) => 
-    // Might not be clear that we want type 'String' and NOT category, so we're gonna make it a named, but REQUIRED parameter
-    _service.documentStream(
-      path: APIPath.category(uid, categoryId),
-      builder: (data, documentId) => Category.fromMap(data, documentId)
-    );
+  Stream<Category> categoryStream({@required String categoryId}) =>
+      // Might not be clear that we want type 'String' and NOT category, so we're gonna make it a named, but REQUIRED parameter
+      _service.documentStream(
+          path: APIPath.category(uid, categoryId),
+          builder: (data, documentId) => Category.fromMap(data, documentId));
 
   @override
-  Stream<List<Category>> categoriesStream() =>
-    _service.collectionStream(
-      path: APIPath.categories(uid),
-      builder: (data, documentId) => Category.fromMap(data, documentId),
-    );
-  
+  Stream<List<Category>> categoriesStream() => _service.collectionStream(
+        path: APIPath.categories(uid),
+        builder: (data, documentId) => Category.fromMap(data, documentId),
+      );
 
   @override
-  Future<void> setCategory(Category category) async =>
-    await _service.setData(
-      path: APIPath.category(uid, category.id),
-      data: category.toMap(),
-    );
+  Future<void> setCategory(Category category) async => await _service.setData(
+        path: APIPath.category(uid, category.id),
+        data: category.toMap(),
+      );
 
   @override
   Future<void> deleteCategory(Category category) async {
@@ -99,12 +93,13 @@ class FirestoreDatabase implements Database {
     for (Task task in tasksList) {
       // Go through all the categories and delete the 'categoryId' property
 
-      // Making new task to replace old one 
+      // Making new task to replace old one
       // TODO: Maybe create a '.copyWith()' method?
       Task newTask = new Task(
         id: task.id,
         name: task.name,
         description: task.description,
+        hasReminder: task.hasReminder,
         categoryId: null,
       );
       await setTask(newTask);
@@ -113,7 +108,4 @@ class FirestoreDatabase implements Database {
     // Delete category itself
     await _service.deleteData(path: APIPath.category(uid, category.id));
   }
-
-  
-
 }

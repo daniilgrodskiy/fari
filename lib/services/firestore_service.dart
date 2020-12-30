@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-
 // SERVICE ONLY USED BY database.dart
 class FirestoreService {
   FirestoreService._();
@@ -11,13 +10,13 @@ class FirestoreService {
     @required String path,
     @required Map<String, dynamic> data,
   }) async {
-    final reference = Firestore.instance.document(path);
+    final reference = FirebaseFirestore.instance.doc(path);
     print("Updating: $path: with $data");
-    await reference.setData(data);
+    await reference.set(data);
   }
 
   Future<void> deleteData({@required String path}) async {
-    final reference = Firestore.instance.document(path);
+    final reference = FirebaseFirestore.instance.doc(path);
     print('Deleting: $path');
     await reference.delete();
   }
@@ -25,11 +24,14 @@ class FirestoreService {
   // TODO: Understand this collectionStream method!
   Stream<List<T>> collectionStream<T>({
     @required String path,
-    @required T builder(Map<String, dynamic> data, String documentID), // Do this to every document
-    Query queryBuilder(Query query), // Closure for filtering through a document's properties
+    @required
+        T builder(Map<String, dynamic> data,
+            String documentID), // Do this to every document
+    Query queryBuilder(
+        Query query), // Closure for filtering through a document's properties
     int sort(T lhs, T rhs),
   }) {
-    Query query = Firestore.instance.collection(path);
+    Query query = FirebaseFirestore.instance.collection(path);
 
     // 'queryBuilder' is used to filter!
     if (queryBuilder != null) {
@@ -38,8 +40,8 @@ class FirestoreService {
 
     final Stream<QuerySnapshot> snapshots = query.snapshots();
     return snapshots.map((snapshot) {
-      final result = snapshot.documents
-          .map((snapshot) => builder(snapshot.data, snapshot.documentID))
+      final result = snapshot.docs
+          .map((snapshot) => builder(snapshot.data(), snapshot.id))
           .where((value) => value != null)
           .toList();
       if (sort != null) {
@@ -53,8 +55,8 @@ class FirestoreService {
     @required String path,
     @required T builder(Map<String, dynamic> data, String documentID),
   }) {
-    final DocumentReference reference = Firestore.instance.document(path);
+    final DocumentReference reference = FirebaseFirestore.instance.doc(path);
     final Stream<DocumentSnapshot> snapshots = reference.snapshots();
-    return snapshots.map((snapshot) => builder(snapshot.data, snapshot.documentID));
+    return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id));
   }
 }

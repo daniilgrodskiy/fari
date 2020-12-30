@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -27,44 +27,46 @@ abstract class AuthBase {
 }
 
 class Auth implements AuthBase {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  User _userFromFirebase(FirebaseUser user) {
-    // Converts a FirebaseUser type into a User type
+  final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
+
+  User _userFromFirebase(auth.User user) {
+    // Converts a auth.auth.User type into a User type
     if (user == null) {
       return null;
     }
 
     print(user.displayName);
     return User(
-        uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl);
+        uid: user.uid, displayName: user.displayName, photoUrl: user.photoURL);
   }
 
   @override
   Stream<User> get onAuthStateChanged {
     // Creates a stream from the original stream that would update whenever the state of our authentication changes
-    // '.map' changes each element from FirebaseUser to User
-    return _firebaseAuth.onAuthStateChanged.map(_userFromFirebase);
+    // '.map' changes each element from auth.auth.User to User
+    return _firebaseAuth.authStateChanges().map(_userFromFirebase);
   }
 
   @override
   Future<User> currentUser() async {
-    // Creates a new User from FirebaseUser
-    final FirebaseUser user = await _firebaseAuth.currentUser();
+    // Creates a new User from auth.auth.User
+    final auth.User user = _firebaseAuth.currentUser;
     return _userFromFirebase(user);
   }
 
   @override
   Future<User> signInAnonymously() async {
-    // Signs in and returns a User from FirebaseUser
-    final AuthResult authResult = await _firebaseAuth.signInAnonymously();
+    // Signs in and returns a User from auth.auth.User
+    final auth.UserCredential authResult =
+        await _firebaseAuth.signInAnonymously();
     return _userFromFirebase(authResult.user);
   }
 
   @override
   Future<User> signInWithEmailAndPassword(String email, String password) async {
     // Signs in through a standard email and a password
-    final AuthResult authResult = await _firebaseAuth
+    final auth.UserCredential authResult = await _firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password);
     return _userFromFirebase(authResult.user);
   }
@@ -73,7 +75,7 @@ class Auth implements AuthBase {
   Future<User> createUserWithEmailAndPassword(
       String email, String password) async {
     // Creates a new user from an email and a password
-    final AuthResult authResult = await _firebaseAuth
+    final auth.UserCredential authResult = await _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password);
     return _userFromFirebase(authResult.user);
   }
@@ -94,12 +96,13 @@ class Auth implements AuthBase {
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         // Checks to see if our accessToken and idToken exists
-        final AuthResult authResult = await _firebaseAuth.signInWithCredential(
-            // We want to sign in through Firebase, so we're going to pass our credentials through Firebase
-            GoogleAuthProvider.getCredential(
-                idToken: googleAuth.idToken,
-                accessToken: googleAuth.accessToken));
-        // Returning a User from our FirebaseUser
+        final auth.UserCredential authResult =
+            await _firebaseAuth.signInWithCredential(
+                // We want to sign in through Firebase, so we're going to pass our credentials through Firebase
+                auth.GoogleAuthProvider.credential(
+                    idToken: googleAuth.idToken,
+                    accessToken: googleAuth.accessToken));
+        // Returning a User from our auth.auth.User
         return _userFromFirebase(authResult.user);
       } else {
         throw PlatformException(

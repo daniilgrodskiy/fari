@@ -51,18 +51,18 @@ class EditTaskPage extends StatefulWidget {
           if (task == null) {
             // New task
             return new EditTaskPageModel(
-              database: database,
-              categoryId: category?.id ??
-                  "", // Only wouldn't be null if we're making a new task from CategoryPage() and want to give the model a default value
-              day: DateTime.now(),
-              time: DateTime.now(),
-              toggleModel: new ToggleModel(
-                showDescription: false,
-                showCategories: false,
-                showDay: false,
-                showTime: false,
-              ),
-            );
+                database: database,
+                categoryId: category?.id ??
+                    "", // Only wouldn't be null if we're making a new task from CategoryPage() and want to give the model a default value
+                day: DateTime.now(),
+                time: DateTime.now(),
+                toggleModel: new ToggleModel(
+                  showDescription: false,
+                  showCategories: false,
+                  showDay: false,
+                  showTime: false,
+                ),
+                hasReminder: false);
           }
           return new EditTaskPageModel(
             database: database,
@@ -79,6 +79,7 @@ class EditTaskPage extends StatefulWidget {
               showTime: task.time != null ? true : false,
             ),
             isCompleted: task.isCompleted,
+            hasReminder: task.hasReminder,
           );
         },
         child: Consumer<EditTaskPageModel>(
@@ -271,7 +272,10 @@ class _EditTaskPageState extends State<EditTaskPage>
   }
 
   Widget _buildTextFieldHeading(String title,
-      {bool isEnabled, VoidCallback onTap}) {
+      {bool isEnabled,
+      VoidCallback onTap,
+      String enabledText,
+      String disabledText}) {
     return Row(
       children: <Widget>[
         Container(
@@ -285,7 +289,9 @@ class _EditTaskPageState extends State<EditTaskPage>
                 ),
           ),
         ),
-        if (isEnabled != null) ToggleFieldButton(isEnabled, onTap)
+        if (isEnabled != null)
+          ToggleFieldButton(
+              isEnabled, onTap, enabledText ?? "Hide", disabledText ?? "Show")
       ],
     );
   }
@@ -334,22 +340,6 @@ class _EditTaskPageState extends State<EditTaskPage>
               textInputAction: TextInputAction.done,
               onChanged: model.updateDescription,
             ),
-          // AnimatedOpacity(
-          //   curve: Curves.easeOut,
-          //   duration: Duration(milliseconds: 400),
-          //   opacity: toggleModel.showDescription ? 1.0 : 0.0,
-          //   child: toggleModel.showDescription ? CustomTextField(
-          //     enabled: model.isLoading == false,
-          //     controller: _descriptionController,
-          //     focusNode: _descriptionFocusNode,
-          //     hintText: "\"3 sets of crunches, 5 sets of pushups\"",
-          //     maxLength: 240,
-          //     minLines: 3,
-          //     maxLines: 5,
-          //     textInputAction: TextInputAction.done,
-          //     onChanged: model.updateDescription,
-          //   ) : Container(),
-          // ),
           SizedBox(
             height: 40.0,
           ),
@@ -372,19 +362,6 @@ class _EditTaskPageState extends State<EditTaskPage>
             height: 20.0,
           ),
           if (toggleModel.showDay) _buildDateSection(),
-          // DateTimeFormField(
-          // onlyDate: true,
-          // initialValue: DateTime.now(),
-          // label: "",
-          // validator: (DateTime dateTime) {
-          //   if (dateTime == null) {
-          //     return "Date Time Required";
-          //   }
-          //   return null;
-          // },
-          // onSaved: (DateTime dateTime) => model.updateDay(dateTime)
-          // ),
-          // _buildDateSection(),
           SizedBox(
             height: 40.0,
           ),
@@ -392,6 +369,10 @@ class _EditTaskPageState extends State<EditTaskPage>
             _buildTextFieldHeading("Time",
                 isEnabled: toggleModel.showTime, onTap: model.toggleShowTime),
           if (toggleModel.showDay && toggleModel.showTime) _buildTimeSection(),
+          SizedBox(
+            height: 40.0,
+          ),
+          if (toggleModel.showDay) _buildReminderSection()
         ],
       ),
     );
@@ -649,6 +630,42 @@ class _EditTaskPageState extends State<EditTaskPage>
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildReminderSection() {
+    return Column(
+      children: [
+        _buildTextFieldHeading("Reminder",
+            isEnabled: model.hasReminder,
+            onTap: () => model.updateHasReminder(!model.hasReminder),
+            enabledText: "Disable",
+            disabledText: "Enable"),
+        // Center(
+        //     child: Container(
+        //   margin: EdgeInsets.all(20.0),
+        //   child: Column(
+        //     children: [
+        //       Text(
+        //         "A notification will be sent on",
+        //         style: Theme.of(context).textTheme.headline6.copyWith(
+        //               color: Colors.black,
+        //               fontSize: 15.0,
+        //               fontWeight: FontWeight.w200,
+        //             ),
+        //       ),
+        //       Text(
+        //         "${DateFormat.yMMMd().format(model.day)} @ ${DateFormat.jm().format(model.time)}",
+        //         style: Theme.of(context).textTheme.headline6.copyWith(
+        //               color: Colors.black,
+        //               fontSize: 20.0,
+        //               fontWeight: FontWeight.w200,
+        //             ),
+        //       ),
+        //     ],
+        //   ),
+        // ))
       ],
     );
   }

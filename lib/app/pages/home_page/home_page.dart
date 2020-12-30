@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage>
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          "Hello, " + (user.displayName.split(" ")[0] ?? ""),
+                          "Hello, " + (user.displayName.split(" ")[0] + "!"),
                           style: Theme.of(context).textTheme.headline6.copyWith(
                               fontSize: 25.0,
                               fontWeight: FontWeight.w600,
