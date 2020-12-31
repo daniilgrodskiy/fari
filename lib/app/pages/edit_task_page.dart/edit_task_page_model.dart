@@ -1,6 +1,8 @@
+import 'package:fari/app/models/reminder.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/edit_task_page.dart/toggle_model.dart';
 import 'package:fari/services/database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class EditTaskPageModel extends ChangeNotifier {
@@ -65,7 +67,7 @@ class EditTaskPageModel extends ChangeNotifier {
 
   /// BLoC methods
 
-  Future<void> submit() async {
+  Future<void> submit(Task originalTask) async {
     updateWith(isLoading: true);
     print("Try");
 
@@ -79,6 +81,10 @@ class EditTaskPageModel extends ChangeNotifier {
 
       // Convert 'time' into only hours and minutes
       time = new DateTime(0, 0, 0, time.hour, time.minute);
+
+      if (hasReminder == null) {
+        hasReminder = false;
+      }
 
       // Check to make sure it's enabled via ToggleModel's properties, THEN check to see that it's not null or empty!
       Task savedTask = new Task(
@@ -100,6 +106,29 @@ class EditTaskPageModel extends ChangeNotifier {
       // await Future.delayed(Duration(seconds: 3));
       // throw new PlatformException(code: "Test", message: "Really testing only!");
       await database.setTask(savedTask);
+
+      Reminder savedReminder = new Reminder(
+        id: id,
+        taskName: savedTask.name,
+        performAt: new DateTime(
+            day.year, day.month, day.day, time.hour ?? 12, time.minute ?? 0),
+        status: "scheduled",
+        token: await FirebaseMessaging().getToken(),
+      );
+
+      if (hasReminder) {
+        // Reminder is set
+        await database.setReminder(
+            reminder: savedReminder, status: "scheduled");
+      } else {
+        // No reminder set
+
+        if (originalTask != null && originalTask.hasReminder) {
+          // Cancel this reminder if there was an original version of the task AND the reminder was true there
+          await database.setReminder(
+              reminder: savedReminder, status: "cancelled");
+        }
+      }
     } catch (e) {
       rethrow;
     }

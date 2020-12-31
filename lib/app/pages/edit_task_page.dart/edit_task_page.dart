@@ -139,7 +139,7 @@ class _EditTaskPageState extends State<EditTaskPage>
     // Called when the form is submitted
     if (_formKey.currentState.validate()) {
       try {
-        await model.submit();
+        await model.submit(task);
         Navigator.of(context).pop(true);
       } on PlatformException catch (e) {
         // Shows the error in a PlatfrormAlertExceptionDialog (which extends PlatformAlertDialog); will be rethrown from the 'submit()' method inside of our bloc
@@ -637,7 +637,7 @@ class _EditTaskPageState extends State<EditTaskPage>
   Widget _buildReminderSection() {
     return Column(
       children: [
-        _buildTextFieldHeading("Reminder",
+        _buildTextFieldHeading("Send Reminder",
             isEnabled: model.hasReminder,
             onTap: () => model.updateHasReminder(!model.hasReminder),
             enabledText: "Disable",

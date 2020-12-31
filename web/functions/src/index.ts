@@ -54,20 +54,20 @@ const workers: Workers = {
     return fcm.sendToDevice(token, payload);
   },
   // Send this for tasks that only specified a day
-  sendReminderDay: ({ token, taskId, taskName }) => {
-    const payload: admin.messaging.MessagingPayload = {
-      notification: {
-        title: `Your task ${taskName} is due today!`,
-        body: "Click here to complete it!",
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
-      },
-      data: {
-        taskId,
-      },
-    };
+  //   sendReminderDay: ({ token, taskId, taskName }) => {
+  //     const payload: admin.messaging.MessagingPayload = {
+  //       notification: {
+  //         title: `Your task ${taskName} is due today!`,
+  //         body: "Click here to complete it!",
+  //         click_action: "FLUTTER_NOTIFICATION_CLICK",
+  //       },
+  //       data: {
+  //         taskId,
+  //       },
+  //     };
 
-    return fcm.sendToDevice(token, payload);
-  },
+  //     return fcm.sendToDevice(token, payload);
+  //   },
 };
 
 export const sendReminderToDevices = functions.pubsub

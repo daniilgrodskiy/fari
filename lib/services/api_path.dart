@@ -10,8 +10,15 @@ class APIPath {
   static String tasks(String uid) => 'users/$uid/tasks';
 
   // Category path
-  static String category(String uid, String categoryId) => 'users/$uid/categories/$categoryId';
+  static String category(String uid, String categoryId) =>
+      'users/$uid/categories/$categoryId';
 
   // Categories path
   static String categories(String uid) => 'users/$uid/categories';
+
+  // Reminder path
+  static String reminder(String taskId) => 'reminders/$taskId';
+
+  // Reminders path
+  static String reminders() => 'reminders/';
 }

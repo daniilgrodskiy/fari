@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fari/app/custom_widgets/common_widgets/add_button.dart';
 import 'package:fari/app/custom_widgets/common_widgets/category_widget.dart';
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
@@ -15,6 +19,7 @@ import 'package:fari/app/pages/tasks_page/tasks_page.dart';
 import 'package:fari/app/task_sort_methods.dart';
 import 'package:fari/services/auth.dart';
 import 'package:fari/services/database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -77,17 +82,79 @@ class _HomePageState extends State<HomePage>
 
   /// Stateful methods
 
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  StreamSubscription iosSubscription;
+
   @override
   void initState() {
+    super.initState();
+    _fcm.requestNotificationPermissions();
+
+    // Animation
     _animationController = new AnimationController(
         duration: new Duration(milliseconds: 200), vsync: this);
     _animationController.forward();
-    super.initState();
+
+    // Firebase messaging
+    // if (Platform.isIOS) {
+    //   iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
+    //     print(data);
+    //     _saveDeviceToken();
+    //   });
+
+    //   _fcm.requestNotificationPermissions(IosNotificationSettings());
+    // } else {
+    //   _saveDeviceToken();
+    // }
+
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        final snackbar = SnackBar(
+          content:
+              Text("Your task ${message['notification']['title']} is due!"),
+        );
+
+        Scaffold.of(context).showSnackBar(snackbar);
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // TODO optional
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // TODO optional
+      },
+    );
   }
+
+  // void _saveDeviceToken() async {
+  //   final user = Provider.of<User>(context, listen: false);
+
+  //   // Get the current user
+  //   String uid = user.uid;
+  //   // FirebaseUser user = await _auth.currentUser();
+
+  //   // Get the token for this device
+  //   String fcmToken = await _fcm.getToken();
+
+  //   // Save it to Firestore
+  //   if (fcmToken != null) {
+  //     var tokens =
+  //         _db.collection('users').doc(uid).collection('tokens').doc(fcmToken);
+
+  //     await tokens.set({
+  //       'token': fcmToken,
+  //       'createdAt': FieldValue.serverTimestamp(), // optional
+  //     });
+  //   }
+  // }
 
   @override
   void dispose() {
     _animationController.dispose();
+    if (iosSubscription != null) iosSubscription.cancel();
     super.dispose();
   }
 
@@ -176,12 +243,6 @@ class _HomePageState extends State<HomePage>
             ifAbsent: () => 1);
       }
     });
-  }
-
-  Widget _buildTopBar() {
-    return TopBar(
-      title: "Home",
-    );
   }
 
   Widget _buildContent(BuildContext context, Database database) {
