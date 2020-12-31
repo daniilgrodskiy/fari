@@ -300,23 +300,47 @@ class _HomePageState extends State<HomePage>
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
             children: [
-              Container(
-                height: 50.0,
-                width: 50.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(user.photoUrl),
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(50),
-                      offset: Offset(0.0, 5.0),
-                      blurRadius: 5.0,
+              user.photoUrl != null
+                  ? Container(
+                      height: 50.0,
+                      width: 50.0,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(user.photoUrl),
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(50),
+                            offset: Offset(0.0, 5.0),
+                            blurRadius: 5.0,
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(
+                      height: 50.0,
+                      width: 50.0,
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[400],
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(50),
+                            offset: Offset(0.0, 5.0),
+                            blurRadius: 5.0,
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        user.displayName.split(" ")[0].substring(0, 1),
+                        style: Theme.of(context).textTheme.headline6.copyWith(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
               SizedBox(width: 10.0),
               Expanded(
                 child: Column(

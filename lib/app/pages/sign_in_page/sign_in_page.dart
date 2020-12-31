@@ -1,7 +1,8 @@
+import 'package:apple_sign_in/apple_sign_in.dart' as appleSignIn;
 import 'package:fari/app/custom_widgets/platform_widgets/platform_exception_alert_dialog.dart';
+import 'package:fari/services/apple_sign_in_available.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fari/app/pages/sign_in_page/email_sign_in_page.dart';
 import 'package:fari/app/pages/sign_in_page/sign_in_manager.dart';
 import 'package:fari/services/auth.dart';
 import 'package:flutter/services.dart';
@@ -54,77 +55,199 @@ class SignInPage extends StatelessWidget {
     ).show(context);
   }
 
-  // SIGN IN METHODS
-  Future<void> _signInAnonymously(BuildContext context) async {
-    try {
-      await manager.signInAnonymously();
-    } on PlatformException catch (e) {
-      _showSignInError(context, e);
-    }
-  }
+  // // SIGN IN METHODS
+  // Future<void> _signInAnonymously(BuildContext context) async {
+  //   try {
+  //     await manager.signInAnonymously();
+  //   } on PlatformException catch (e) {
+  //     _showSignInError(context, e);
+  //   }
+  // }
 
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
       await manager.signInWithGoogle();
     } on PlatformException catch (e) {
-      if (e.code != 'ERROR_ABORTED_BY_USER') {
-        // If the user only exited out of the Google sign in prompt, we do NOT want to show an error
-        _showSignInError(context, e);
-      }
+      // if (e.code != 'ERROR_ABORTED_BY_USER') {
+      //   // If the user only exited out of the Google sign in prompt, we do NOT want to show an error
+      //   _showSignInError(context, e);
+      // }
     }
   }
 
-  void _signInWithEmail(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(
-        fullscreenDialog: true,
-        builder: (BuildContext context) => EmailSignInPage()));
+  Future<void> _signInWithApple(BuildContext context) async {
+    try {
+      final authService = Provider.of<AuthBase>(context, listen: false);
+      final user = await authService.signInWithApple();
+      print('uid: ${user.uid}');
+    } catch (e) {
+      print(e);
+    }
   }
+
+  // void _signInWithEmail(BuildContext context) {
+  //   Navigator.of(context).push(MaterialPageRoute<void>(
+  //       fullscreenDialog: true,
+  //       builder: (BuildContext context) => EmailSignInPage()));
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final appleSignInAvailable =
+        Provider.of<AppleSignInAvailable>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: _buildContent(context),
+      body: _buildContent(context, appleSignInAvailable),
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(
+      BuildContext context, AppleSignInAvailable appleSignInAvailable) {
     return Padding(
       // color: Colors.yellow,
       padding: EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 50.0, child: _builderHeader(context)),
-          SizedBox(height: 48.0),
+          SizedBox(
+            height: 175.0,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  "./assets/launch_screen.png",
+                ),
+              ),
+            ),
+            height: 150.0,
+            width: 150.0,
+          ),
+          SizedBox(
+            height: 50.0,
+          ),
+          GestureDetector(
+            onTap: () => _signInWithGoogle(context),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0)),
+              padding: EdgeInsets.all(20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                          "./assets/google_logo.png",
+                        ),
+                      ),
+                    ),
+                    height: 25.0,
+                    width: 25.0,
+                  ),
+                  SizedBox(
+                    width: 18.0,
+                  ),
+                  Text("Sign in with Google")
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 20.0),
+          GestureDetector(
+            onTap: () => _signInWithApple(context),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10.0)),
+              padding: EdgeInsets.all(20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                          "./assets/apple_logo.png",
+                        ),
+                      ),
+                    ),
+                    height: 25.0,
+                    width: 25.0,
+                  ),
+                  SizedBox(
+                    width: 18.0,
+                  ),
+                  Text(
+                    "Sign in with Apple",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+          ),
+
+          Spacer(),
+          // SizedBox(height: 50.0, child: _builderHeader(context)),
           // Google sign in
-          FlatButton(
-            onPressed: isLoading ? null : () => _signInWithGoogle(context),
-            child: Text('Sign in with Google'),
-          ),
-          SizedBox(height: 8.0),
+          // GestureDetector(
+          //     onTap: isLoading ? null : () => _signInWithGoogle(context),
+          //     child: Container(
+          //         width: 20.0,
+          //         child: Row(
+          //           mainAxisSize: MainAxisSize.min,
+          //           children: [
+          //             Image.asset(
+          //               "./assets/google_logo.png",
+          //               scale: 0.1,
+          //             ),
+          //             Text("Sign in with Google")
+          //           ],
+          //         ))),
+          // Apple sign in
+          // if (appleSignInAvailable.isAvailable)
+          //   appleSignIn.AppleSignInButton(
+          //     style: appleSignIn.ButtonStyle.black,
+          //     type: appleSignIn.ButtonType.signIn,
+          //     onPressed: () => _signInWithApple(context),
+          //   ),
           // Email sign in
-          FlatButton(
-            onPressed: isLoading ? null : () => _signInWithEmail(context),
-            child: Text('Sign in with email'),
-          ),
-          SizedBox(height: 8.0),
+          // FlatButton(
+          //   onPressed: isLoading ? null : () => _signInWithEmail(context),
+          //   child: Text('Sign in with email'),
+          // ),
+          // SizedBox(height: 8.0),
+          // Text(
+          //   "or",
+          //   style: TextStyle(fontSize: 14.0, color: Colors.black87),
+          //   textAlign: TextAlign.center,
+          // ),
+          // SizedBox(height: 8.0),
+          // // Anyonymous sign in
+          // FlatButton(
+          //   onPressed: isLoading ? null : () => _signInAnonymously(context),
+          //   child: Text('Go anonymous'),
+          // ),
           Text(
-            "or",
-            style: TextStyle(fontSize: 14.0, color: Colors.black87),
-            textAlign: TextAlign.center,
+            "\u00a9 Daniil Grodskiy",
+            style: Theme.of(context).textTheme.headline6.copyWith(
+                  color: Colors.black,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w200,
+                ),
           ),
-          SizedBox(height: 8.0),
-          // Anyonymous sign in
-          FlatButton(
-            onPressed: isLoading ? null : () => _signInAnonymously(context),
-            child: Text('Go anonymous'),
-          ),
+          SizedBox(height: 15.0),
         ],
       ),
     );
   }
+
+  Widget _buildButton() {}
 
   Widget _builderHeader(BuildContext context) {
     if (isLoading) {

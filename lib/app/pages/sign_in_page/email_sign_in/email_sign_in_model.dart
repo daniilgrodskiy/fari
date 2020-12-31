@@ -1,4 +1,4 @@
-import 'package:fari/app/pages/sign_in_page/validators.dart';
+import 'package:fari/app/pages/sign_in_page/email_sign_in/validators.dart';
 
 enum EmailSignInFormType{
   signIn,
