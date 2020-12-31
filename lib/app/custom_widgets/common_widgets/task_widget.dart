@@ -82,8 +82,9 @@ class _TaskWidgetState extends State<TaskWidget>
             Scaffold.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                duration: Duration(seconds: 5),
+                elevation: 1.0,
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                duration: Duration(seconds: 100),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.red[400],
                 content: Text("\"${task.name}\" has been deleted"),

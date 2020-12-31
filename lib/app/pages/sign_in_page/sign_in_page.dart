@@ -1,4 +1,5 @@
 import 'package:apple_sign_in/apple_sign_in.dart' as appleSignIn;
+import 'package:apple_sign_in/scope.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_exception_alert_dialog.dart';
 import 'package:fari/services/apple_sign_in_available.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,13 @@ class SignInPage extends StatelessWidget {
   Future<void> _signInWithApple(BuildContext context) async {
     try {
       final authService = Provider.of<AuthBase>(context, listen: false);
-      final user = await authService.signInWithApple();
+
+      final List<Scope> scopes = [
+        appleSignIn.Scope.email,
+        appleSignIn.Scope.fullName
+      ];
+
+      final user = await authService.signInWithApple(scopes: scopes);
       print('uid: ${user.uid}');
     } catch (e) {
       print(e);
@@ -121,11 +128,19 @@ class SignInPage extends StatelessWidget {
                 ),
               ),
             ),
-            height: 150.0,
-            width: 150.0,
+            height: 100.0,
+            width: 250.0,
+          ),
+          Text(
+            "The simple task app for all your needs!",
+            style: Theme.of(context).textTheme.headline6.copyWith(
+                  color: Colors.black,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w200,
+                ),
           ),
           SizedBox(
-            height: 50.0,
+            height: 250.0,
           ),
           GestureDetector(
             onTap: () => _signInWithGoogle(context),
@@ -238,7 +253,7 @@ class SignInPage extends StatelessWidget {
             style: Theme.of(context).textTheme.headline6.copyWith(
                   color: Colors.black,
                   fontSize: 15.0,
-                  fontWeight: FontWeight.w200,
+                  fontWeight: FontWeight.w400,
                 ),
           ),
           SizedBox(height: 15.0),

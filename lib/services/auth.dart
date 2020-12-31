@@ -27,7 +27,7 @@ abstract class AuthBase {
   // Future<User> createUserWithEmailAndPassword(String email, String password);
   // Future<User> signInAnonymously();
   Future<User> signInWithGoogle();
-  Future<User> signInWithApple();
+  Future<User> signInWithApple({List<Scope> scopes});
   Future<void> signOut();
 }
 
@@ -138,6 +138,7 @@ class Auth implements AuthBase {
         if (scopes.contains(Scope.fullName)) {
           final displayName =
               '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
+          print("Display name: " + displayName);
           await firebaseUser.updateProfile(displayName: displayName);
         }
         return _userFromFirebase(firebaseUser);

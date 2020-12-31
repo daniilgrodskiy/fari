@@ -300,47 +300,7 @@ class _HomePageState extends State<HomePage>
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
             children: [
-              user.photoUrl != null
-                  ? Container(
-                      height: 50.0,
-                      width: 50.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(user.photoUrl),
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(50),
-                            offset: Offset(0.0, 5.0),
-                            blurRadius: 5.0,
-                          ),
-                        ],
-                      ),
-                    )
-                  : Container(
-                      height: 50.0,
-                      width: 50.0,
-                      decoration: BoxDecoration(
-                        color: Colors.indigo[400],
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(50),
-                            offset: Offset(0.0, 5.0),
-                            blurRadius: 5.0,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        user.displayName.split(" ")[0].substring(0, 1),
-                        style: Theme.of(context).textTheme.headline6.copyWith(
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                      ),
-                    ),
+              _buildAvatar(user),
               SizedBox(width: 10.0),
               Expanded(
                 child: Column(
@@ -350,7 +310,12 @@ class _HomePageState extends State<HomePage>
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          "Hello, " + (user.displayName.split(" ")[0] + "!"),
+                          "Hello" +
+                              ((user.displayName.split(" ")[0] == "null"
+                                      ? ""
+                                      : ", " +
+                                          user.displayName?.split(" ")[0]) +
+                                  "!"),
                           style: Theme.of(context).textTheme.headline6.copyWith(
                               fontSize: 25.0,
                               fontWeight: FontWeight.w600,
@@ -504,6 +469,65 @@ class _HomePageState extends State<HomePage>
         ),
       ],
     );
+  }
+
+  Widget _buildAvatar(User user) {
+    // print(user.photoUrl);
+    // print(user.displayName.split(" ")[0]);
+    if (user.photoUrl == null || user.photoUrl == "null") {
+      // No photo
+      if (user.displayName == null ||
+          user.displayName.split(" ")[0] == "null") {
+        // No name
+        return Container();
+      } else {
+        // Name exists
+        return Container(
+          height: 50.0,
+          width: 50.0,
+          decoration: BoxDecoration(
+            color: Colors.indigo[400],
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(50),
+                offset: Offset(0.0, 5.0),
+                blurRadius: 5.0,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              user.displayName.split(" ")[0].substring(0, 1),
+              style: Theme.of(context).textTheme.headline6.copyWith(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+            ),
+          ),
+        );
+      }
+    } else {
+      // There is a photo url
+      return Container(
+        height: 50.0,
+        width: 50.0,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(user.photoUrl),
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(50),
+              offset: Offset(0.0, 5.0),
+              blurRadius: 5.0,
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   List<Widget> _buildTimelineDay() {
