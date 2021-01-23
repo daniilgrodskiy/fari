@@ -117,12 +117,16 @@ class EditTaskPageModel extends ChangeNotifier {
       );
 
       if (hasReminder) {
-        // Reminder is set
-        await database.setReminder(
-            reminder: savedReminder, status: "scheduled");
+        // Reminder is set for new task
+        if (originalTask == null ||
+            (originalTask != null && !originalTask.hasReminder)) {
+          // If there was no original task, then set a reminder
+          // If there WAS an original task but the reminder did not exist, set a reminder
+          await database.setReminder(
+              reminder: savedReminder, status: "scheduled");
+        }
       } else {
-        // No reminder set
-
+        // No reminder set for new task
         if (originalTask != null && originalTask.hasReminder) {
           // Cancel this reminder if there was an original version of the task AND the reminder was true there
           await database.setReminder(

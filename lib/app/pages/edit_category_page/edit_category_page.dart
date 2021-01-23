@@ -76,6 +76,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
     "e74c3c",
     "95a5a6",
   ];
+  ScrollController _listViewScrollController;
 
   /// Getter methods
 
@@ -86,12 +87,18 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
   void initState() {
     super.initState();
     _nameController.text = category?.name;
+
+    _listViewScrollController = new ScrollController();
+    _listViewScrollController.addListener(() {
+      FocusScope.of(context).unfocus();
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     _nameController.dispose();
+    _listViewScrollController.dispose();
   }
 
   //// Service methods
@@ -153,6 +160,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
           body: Stack(
             children: <Widget>[
               ListView(
+                controller: _listViewScrollController,
                 children: <Widget>[
                   SizedBox(
                     height: 30.0,
@@ -164,7 +172,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                   _buildForm(),
                   if (category != null) _buildDeleteButton(),
                   SizedBox(
-                    height: 150.0,
+                    height: 400.0,
                   ),
                 ],
               ),

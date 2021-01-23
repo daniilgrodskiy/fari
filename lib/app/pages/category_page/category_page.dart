@@ -338,10 +338,11 @@ class CategoryPage extends StatelessWidget {
                         .name
                         .toLowerCase()
                         .contains(model.search.toLowerCase()) ||
-                    tasks[index]
-                        .description
-                        .toLowerCase()
-                        .contains(model.search.toLowerCase())
+                    (tasks[index].description != null &&
+                        tasks[index]
+                            .description
+                            .toLowerCase()
+                            .contains(model.search.toLowerCase()))
                 ? TaskWidget(
                     task: tasks[index],
                     database: database,

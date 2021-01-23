@@ -66,8 +66,20 @@ class FirestoreDatabase implements Database {
       );
 
   @override
-  Future<void> deleteTask(Task task) async =>
-      await _service.deleteData(path: APIPath.task(uid, task.id));
+  Future<void> deleteTask(Task task) async {
+    await _service.deleteData(path: APIPath.task(uid, task.id));
+
+    // Delete any reminders with that task too
+    try {
+        // See if the reminder actually exists (might have been already deleted)
+        await _service.deleteData(
+          path: APIPath.reminder(task.id),
+        );
+      } catch (e) {
+        print(e);
+      }
+
+  }
 
   // CATEGORY METHODS
   @override
@@ -118,20 +130,34 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> setReminder({Reminder reminder, String status}) async {
     if (status == "cancelled") {
-      reminder = new Reminder(
-        id: reminder.id,
-        performAt: reminder.performAt,
-        status: "cancelled",
-        taskName: reminder.taskName,
-        token: reminder.token,
-      );
+      // reminder = new Reminder(
+      //   id: reminder.id,
+      //   performAt: reminder.performAt,
+      //   status: "cancelled",
+      //   taskName: reminder.taskName,
+      //   token: reminder.token,
+      // );
+
+      // Delete the reminder from the db.
+      try {
+        // See if the reminder actually exists (might have been already deleted)
+        await _service.deleteData(
+          path: APIPath.reminder(reminder.id),
+        );
+      } catch (e) {
+        print(e);
+      }
+
+      return;
     }
 
-    // TODO: Add APIPath for reminder
-
-    await _service.setData(
-      path: APIPath.reminder(reminder.id),
-      data: reminder.toMap(),
-    );
+    try {
+      await _service.setData(
+        path: APIPath.reminder(reminder.id),
+        data: reminder.toMap(),
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 }

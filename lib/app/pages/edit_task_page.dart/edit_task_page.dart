@@ -110,6 +110,8 @@ class _EditTaskPageState extends State<EditTaskPage>
   final _descriptionFocusNode = new FocusNode();
   final _formKey = new GlobalKey<FormState>();
 
+  ScrollController _listViewScrollController;
+
   //// Getters
 
   Task get task => widget.task;
@@ -122,6 +124,11 @@ class _EditTaskPageState extends State<EditTaskPage>
     super.initState();
     _nameController.text = task?.name;
     _descriptionController.text = task?.description;
+
+    _listViewScrollController = new ScrollController();
+    _listViewScrollController.addListener(() {
+      FocusScope.of(context).unfocus();
+    });
   }
 
   @override
@@ -131,6 +138,7 @@ class _EditTaskPageState extends State<EditTaskPage>
     _descriptionController.dispose();
     _nameFocusNode.dispose();
     _descriptionFocusNode.dispose();
+    _listViewScrollController.dispose();
   }
 
   //// Service methods
@@ -194,6 +202,7 @@ class _EditTaskPageState extends State<EditTaskPage>
           body: Stack(
             children: <Widget>[
               ListView(
+                controller: _listViewScrollController,
                 children: <Widget>[
                   SizedBox(
                     height: 30.0,
@@ -208,7 +217,7 @@ class _EditTaskPageState extends State<EditTaskPage>
                   ),
                   if (task != null) _buildDeleteButton(),
                   SizedBox(
-                    height: 150.0,
+                    height: 400.0,
                   ),
                 ],
               ),

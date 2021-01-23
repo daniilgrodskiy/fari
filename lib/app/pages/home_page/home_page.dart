@@ -603,26 +603,26 @@ class _HomePageState extends State<HomePage>
                         ),
                         // SizedBox(width: 10.0),
                         Spacer(),
-                        if (isFirst)
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 10.0),
-                              decoration: BoxDecoration(
-                                color: Colors.indigo[400],
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              child: Text(
-                                "Filter",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .copyWith(
-                                        color: Colors.white, fontSize: 15.0),
-                              ),
-                            ),
-                          ),
+                        // if (isFirst)
+                        //   GestureDetector(
+                        //     onTap: () {},
+                        //     child: Container(
+                        //       padding: EdgeInsets.symmetric(
+                        //           horizontal: 20.0, vertical: 10.0),
+                        //       decoration: BoxDecoration(
+                        //         color: Colors.indigo[400],
+                        //         borderRadius: BorderRadius.circular(5.0),
+                        //       ),
+                        //       child: Text(
+                        //         "Filter",
+                        //         style: Theme.of(context)
+                        //             .textTheme
+                        //             .headline6
+                        //             .copyWith(
+                        //                 color: Colors.white, fontSize: 15.0),
+                        //       ),
+                        //     ),
+                        //   ),
                         SizedBox(width: 20.0),
                       ],
                     ),

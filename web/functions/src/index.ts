@@ -43,8 +43,8 @@ const workers: Workers = {
   sendReminder: ({ token, taskId, taskName }) => {
     const payload: admin.messaging.MessagingPayload = {
       notification: {
-        title: `Your task ${taskName} is due!`,
-        body: "Click here to complete it!",
+        title: "⭐️ Your Fari task is due! ⭐️",
+        body: `'${taskName}' is due. Click here to complete it. 🥳`,
         click_action: "FLUTTER_NOTIFICATION_CLICK",
       },
       data: {
@@ -53,21 +53,6 @@ const workers: Workers = {
     };
     return fcm.sendToDevice(token, payload);
   },
-  // Send this for tasks that only specified a day
-  //   sendReminderDay: ({ token, taskId, taskName }) => {
-  //     const payload: admin.messaging.MessagingPayload = {
-  //       notification: {
-  //         title: `Your task ${taskName} is due today!`,
-  //         body: "Click here to complete it!",
-  //         click_action: "FLUTTER_NOTIFICATION_CLICK",
-  //       },
-  //       data: {
-  //         taskId,
-  //       },
-  //     };
-
-  //     return fcm.sendToDevice(token, payload);
-  //   },
 };
 
 export const sendReminderToDevices = functions.pubsub
@@ -89,6 +74,7 @@ export const sendReminderToDevices = functions.pubsub
     reminders.forEach((snapshot) => {
       const { worker, options } = snapshot.data();
 
+      // Run the function found in the 'workers' array above via 'workers[worker](options)' and then delete the reminder if it worked
       const job = workers[worker](options)
         .then(() => snapshot.ref.update({ status: "complete" }))
         .catch((err) => snapshot.ref.update({ status: "error" }));
