@@ -1,14 +1,18 @@
 import 'package:fari/app/landing_page.dart';
 import 'package:fari/services/apple_sign_in_available.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fari/services/auth.dart';
+// import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.black, // '.white' : white status bar for Android
       statusBarBrightness:
@@ -16,6 +20,9 @@ void main() async {
       ));
 
   await Firebase.initializeApp();
+  await FirebaseAdMob.instance
+      .initialize(appId: "ca-app-pub-3446106133887966~5236144498");
+
   final appleSignInAvailable = await AppleSignInAvailable.check();
   runApp(Provider<AppleSignInAvailable>.value(
     value: appleSignInAvailable,

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fari/app/custom_widgets/common_widgets/add_button.dart';
 import 'package:fari/app/custom_widgets/common_widgets/category_widget.dart';
@@ -19,8 +18,13 @@ import 'package:fari/app/pages/tasks_page/tasks_page.dart';
 import 'package:fari/app/task_sort_methods.dart';
 import 'package:fari/services/auth.dart';
 import 'package:fari/services/database.dart';
+// import 'package:firebase_admob/firebase_admob.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_admob/flutter_native_admob.dart';
+import 'package:flutter_native_admob/native_admob_controller.dart';
+// import 'package:flutter_native_admob/flutter_native_admob.dart';
+// import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -83,78 +87,76 @@ class _HomePageState extends State<HomePage>
   /// Stateful methods
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseMessaging _fcm = FirebaseMessaging();
-  StreamSubscription iosSubscription;
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+
+  /// ADS
+  // final _nativeAdController = NativeAdmobController();
+  // StreamSubscription _subscription;
+  // double _height = 0;
+
+  // void _onStateChanged(AdLoadState state) {
+  //   switch (state) {
+  //     case AdLoadState.loading:
+  //       setState(() {
+  //         _height = 0;
+  //       });
+  //       break;
+
+  //     case AdLoadState.loadCompleted:
+  //       setState(() {
+  //         _height = 330;
+  //       });
+  //       break;
+
+  //     default:
+  //       break;
+  //   }
+  // }
+  /////////
+  ///
 
   @override
   void initState() {
     super.initState();
-    _fcm.requestNotificationPermissions();
+    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
 
     // Animation
     _animationController = new AnimationController(
         duration: new Duration(milliseconds: 200), vsync: this);
     _animationController.forward();
 
-    // Firebase messaging
-    // if (Platform.isIOS) {
-    //   iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
-    //     print(data);
-    //     _saveDeviceToken();
-    //   });
+    // Ads
+    // NativeAdmob(
+    //   type: NativeAdmobType.banner,
+    //   // factoryId: "testFactoryId",
+    //   adUnitID: "ca-app-pub-3446106133887966/6536853537",
+    //   // loading: Center(child: CircularProgressIndicator()),
+    //   // error: Container(),
+    // );
+    // ..load()
+    // ..show(anchorType: AnchorType.top);
 
-    //   _fcm.requestNotificationPermissions(IosNotificationSettings());
-    // } else {
-    //   _saveDeviceToken();
-    // }
+    // Messaging
+    try {
+      _fcm.requestPermission();
+    } catch (e) {
+      print("Can't request notifications!");
+    }
 
-    _fcm.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        final snackbar = SnackBar(
-          content:
-              Text("Your task ${message['notification']['title']} is due!"),
-        );
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("onMessage: $message");
+      final snackbar = SnackBar(
+        content: Text("Your task ${message.notification.title} is due!"),
+      );
 
-        Scaffold.of(context).showSnackBar(snackbar);
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        // TODO optional
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-        // TODO optional
-      },
-    );
+      Scaffold.of(context).showSnackBar(snackbar);
+    });
   }
-
-  // void _saveDeviceToken() async {
-  //   final user = Provider.of<User>(context, listen: false);
-
-  //   // Get the current user
-  //   String uid = user.uid;
-  //   // FirebaseUser user = await _auth.currentUser();
-
-  //   // Get the token for this device
-  //   String fcmToken = await _fcm.getToken();
-
-  //   // Save it to Firestore
-  //   if (fcmToken != null) {
-  //     var tokens =
-  //         _db.collection('users').doc(uid).collection('tokens').doc(fcmToken);
-
-  //     await tokens.set({
-  //       'token': fcmToken,
-  //       'createdAt': FieldValue.serverTimestamp(), // optional
-  //     });
-  //   }
-  // }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    if (iosSubscription != null) iosSubscription.cancel();
+    // _subscription.cancel();
+    // _nativeAdController.dispose();
     super.dispose();
   }
 
@@ -260,6 +262,18 @@ class _HomePageState extends State<HomePage>
         SizedBox(
           height: 20.0,
         ),
+        // Container(
+        //   height: _height,
+        //   padding: EdgeInsets.all(10),
+        //   margin: EdgeInsets.only(bottom: 20.0),
+        //   child: NativeAdmob(
+        //     // Your ad unit id
+        //     adUnitID: "ca-app-pub-3446106133887966/3808965450",
+        //     controller: _nativeAdController,
+        //     // Don't show loading widget when in loading state
+        //     loading: Container(),
+        //   ),
+        // ),
         // Date timeline
         Container(
           // padding: EdgeInsets.symmetric(vertical: 10.0),
