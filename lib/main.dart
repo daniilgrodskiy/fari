@@ -30,8 +30,6 @@ void main() async {
   //   nativeAdUnitId: "ca-app-pub-3446106133887966/3808965450",
   // );
 
-  // await MobileAds.requestTrackingAuthorization();
-
   final appleSignInAvailable = await AppleSignInAvailable.check();
 
   final initFuture = MobileAds.instance.initialize();
@@ -42,7 +40,6 @@ void main() async {
     child: Provider<AdState>.value(
         value: adState, builder: (context, child) => MyApp()),
   ));
-  // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

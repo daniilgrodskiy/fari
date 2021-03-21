@@ -3,15 +3,17 @@ import 'package:fari/app/custom_widgets/common_widgets/sort_tasks_bottom_sheet.d
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/top_bar/search_bar.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
+import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
 import 'package:fari/app/pages/tasks_page/tasks_page_model.dart';
 import 'package:fari/app/task_sort_methods.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
-class TasksPage extends StatelessWidget {
+class TasksPage extends StatefulWidget {
   TasksPage({
     @required this.model,
     @required this.database,
@@ -73,7 +75,37 @@ class TasksPage extends StatelessWidget {
         });
   }
 
-  /// Build methood
+  @override
+  _TasksPageState createState() => _TasksPageState();
+}
+
+class _TasksPageState extends State<TasksPage> {
+  /// Build method
+
+  @override
+  void dispose() {
+    super.dispose();
+    banner?.dispose();
+  }
+
+  BannerAd banner;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+
+    adState.initalization.then((status) {
+      setState(() {
+        banner = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: adState.adListener)
+          ..load();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +116,7 @@ class TasksPage extends StatelessWidget {
         context,
         SearchBar(
           hintText: "Search all tasks",
-          onChanged: model.updateSearch,
+          onChanged: widget.model.updateSearch,
         ),
       ),
       backgroundColor: Colors.grey[50],
@@ -92,7 +124,7 @@ class TasksPage extends StatelessWidget {
         children: <Widget>[
           _buildContent(context),
           AddButton(
-            onTap: () => EditTaskPage.show(context, database: database),
+            onTap: () => EditTaskPage.show(context, database: widget.database),
           )
         ],
       ),
@@ -100,26 +132,6 @@ class TasksPage extends StatelessWidget {
   }
 
   /// UI methods
-
-  Widget _buildButton(BuildContext context, VoidCallback onTap, String text) {
-    GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
-        decoration: BoxDecoration(
-          color: Colors.indigo[400],
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Text(
-          text,
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: Colors.white, fontSize: 10.0),
-        ),
-      ),
-    );
-  }
 
   Widget _buildContent(BuildContext context) {
     return ListView(
@@ -143,7 +155,7 @@ class TasksPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  (tasks.length.toString() ?? "No ") + " tasks",
+                  (widget.tasks.length.toString() ?? "No ") + " tasks",
                   style: Theme.of(context).textTheme.headline6.copyWith(
                         color: Colors.black.withAlpha(150),
                         fontWeight: FontWeight.w400,
@@ -161,10 +173,10 @@ class TasksPage extends StatelessWidget {
                     useRootNavigator: true,
                     builder: (context) => SortTasksBottomSheet(
                           showCategoryOption: false,
-                          currentSortType: model.sortType,
+                          currentSortType: widget.model.sortType,
                           onTap: (newSortType) {
                             Navigator.pop(context);
-                            model.updateSortType(newSortType);
+                            widget.model.updateSortType(newSortType);
                           },
                         ));
               },
@@ -212,6 +224,18 @@ class TasksPage extends StatelessWidget {
         SizedBox(
           height: 20.0,
         ),
+        if (banner == null)
+          SizedBox(
+            height: 50,
+          )
+        else
+          Container(
+              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+              height: 50,
+              child: AdWidget(ad: banner)),
+        SizedBox(
+          height: 20.0,
+        ),
         _buildTasks(context),
         SizedBox(
           height: 200.0,
@@ -221,47 +245,65 @@ class TasksPage extends StatelessWidget {
   }
 
   Widget _buildTasks(BuildContext context) {
-    if (tasks.isEmpty) {
+    if (widget.tasks.isEmpty) {
       return _buildNoTasksContainer(context);
     }
 
     // Filter task
-    switch (model.sortType) {
+    switch (widget.model.sortType) {
       case SortType.DueDate:
-        tasks.sort(TaskSortMethods.dueDate);
+        widget.tasks.sort(TaskSortMethods.dueDate);
         break;
       case SortType.DateCreation:
-        tasks.sort(TaskSortMethods.dateCreation);
+        widget.tasks.sort(TaskSortMethods.dateCreation);
         break;
       case SortType.Alphabetically:
-        tasks.sort(TaskSortMethods.alphabetically);
+        widget.tasks.sort(TaskSortMethods.alphabetically);
         break;
       case SortType.Category:
-        tasks.sort(TaskSortMethods.category);
+        widget.tasks.sort(TaskSortMethods.category);
         break;
     }
 
     return ListView.builder(
         shrinkWrap: true,
         physics: ClampingScrollPhysics(),
-        itemCount: tasks.length,
+        itemCount: widget.tasks.length,
         itemBuilder: (context, index) =>
             // I'M SO HAPPY LMAOOO ONLY SHOW TASKS THAT MATCH UP BY NAME BRO I WAS TRYING TO QUERY THE WHOLE DAMN DATABASE OMG THANK GOD I REALIZED THIS WAY WORKS TOO OMG IM SO HAPPY BC I REALIZED THAT BECAUSE WE RESET THE PAGE EACH TIME, THE MODEL AUTOMATICALLY QUERIES EACH TIME WE SEARCH SOMETHING NEW UP (BAD BAD BAD)
-            tasks[index]
-                        .name
+            widget.tasks[index].name
                         .toLowerCase()
-                        .contains(model.search.toLowerCase()) ||
-                    (tasks[index].description != null &&
-                        tasks[index]
-                            .description
+                        .contains(widget.model.search.toLowerCase()) ||
+                    (widget.tasks[index].description != null &&
+                        widget.tasks[index].description
                             .toLowerCase()
-                            .contains(model.search.toLowerCase()))
+                            .contains(widget.model.search.toLowerCase()))
                 ? TaskWidget(
-                    task: tasks[index],
-                    database: database,
+                    task: widget.tasks[index],
+                    database: widget.database,
                     showDate: true,
                   )
                 : Container());
+  }
+
+  Widget _buildButton(BuildContext context, VoidCallback onTap, String text) {
+    GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+        decoration: BoxDecoration(
+          color: Colors.indigo[400],
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Text(
+          text,
+          style: Theme.of(context)
+              .textTheme
+              .headline6
+              .copyWith(color: Colors.white, fontSize: 10.0),
+        ),
+      ),
+    );
   }
 
   Widget _buildNoTasksContainer(BuildContext context) {
@@ -281,7 +323,7 @@ class TasksPage extends StatelessWidget {
       margin: EdgeInsets.all(20.0),
       child: Center(
           child: Text(
-        model.search != null
+        widget.model.search != null
             ? "No tasks found"
             : "Click the plus button below to create your first task!",
         textAlign: TextAlign.center,
