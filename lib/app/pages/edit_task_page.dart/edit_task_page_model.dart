@@ -113,7 +113,7 @@ class EditTaskPageModel extends ChangeNotifier {
         performAt: new DateTime(
             day.year, day.month, day.day, time.hour ?? 12, time.minute ?? 0),
         status: "scheduled",
-        token: await FirebaseMessaging().getToken(),
+        token: await FirebaseMessaging.instance.getToken(),
       );
 
       if (hasReminder) {

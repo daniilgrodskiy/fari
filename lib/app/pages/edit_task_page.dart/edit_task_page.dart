@@ -15,7 +15,6 @@ import 'package:fari/app/pages/edit_task_page.dart/toggle_model.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_datetime_formfield/flutter_datetime_formfield.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -205,7 +204,11 @@ class _EditTaskPageState extends State<EditTaskPage>
                 controller: _listViewScrollController,
                 children: <Widget>[
                   SizedBox(
-                    height: 30.0,
+                    height: 5.0,
+                  ),
+                  if (task != null) _buildDeleteButton(),
+                  SizedBox(
+                    height: 20.0,
                   ),
                   _buildHeading(),
                   SizedBox(
@@ -215,7 +218,6 @@ class _EditTaskPageState extends State<EditTaskPage>
                   SizedBox(
                     height: 30.0,
                   ),
-                  if (task != null) _buildDeleteButton(),
                   SizedBox(
                     height: 400.0,
                   ),
@@ -523,7 +525,7 @@ class _EditTaskPageState extends State<EditTaskPage>
                     spreadRadius: -5.0),
               ]),
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-          margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          margin: EdgeInsets.fromLTRB(20.0, 10.0, 80.0, 20.0),
           child: Center(
             child: Text(
               "Delete task",
