@@ -7,6 +7,7 @@ import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
 import 'package:fari/app/custom_widgets/useful_time_methods.dart';
+import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/calendar/calendar_page.dart';
@@ -24,6 +25,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_native_admob/flutter_native_admob.dart';
 // import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -156,6 +158,26 @@ class _HomePageState extends State<HomePage>
     // _subscription.cancel();
     // _nativeAdController.dispose();
     super.dispose();
+    banner?.dispose();
+  }
+
+  BannerAd banner;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+
+    adState.initalization.then((status) {
+      setState(() {
+        banner = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: adState.adListener)
+          ..load();
+      });
+    });
   }
 
   /// Build method
@@ -260,18 +282,6 @@ class _HomePageState extends State<HomePage>
         SizedBox(
           height: 20.0,
         ),
-        // Container(
-        //   height: _height,
-        //   padding: EdgeInsets.all(10),
-        //   margin: EdgeInsets.only(bottom: 20.0),
-        //   child: NativeAdmob(
-        //     // Your ad unit id
-        //     adUnitID: "ca-app-pub-3446106133887966/3808965450",
-        //     controller: _nativeAdController,
-        //     // Don't show loading widget when in loading state
-        //     loading: Container(),
-        //   ),
-        // ),
         // Date timeline
         Container(
           // padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -361,7 +371,7 @@ class _HomePageState extends State<HomePage>
               GestureDetector(
                 onTap: () async {
                   bool signOut = await PlatformAlertDialog(
-                    title: "Are you want to sign out?",
+                    title: "Are you sure you want to sign out?",
                     content: "",
                     defaultActionText: "Yes",
                     cancelActionText: "No",
@@ -444,11 +454,16 @@ class _HomePageState extends State<HomePage>
         SizedBox(
           height: 10.0,
         ),
-        // NativeAd(
-        //   buildLayout: adBannerLayoutBuilder,
-        //   loading: Text('loading'),
-        //   error: Text('error'),
-        // ),
+        if (banner == null)
+          SizedBox(
+            height: 50,
+          )
+        else
+          Container(
+              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+              height: 50,
+              child: AdWidget(ad: banner)),
+        SizedBox(height: 20.0),
         Row(
           children: <Widget>[
             Container(

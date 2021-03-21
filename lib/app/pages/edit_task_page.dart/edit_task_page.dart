@@ -159,6 +159,7 @@ class _EditTaskPageState extends State<EditTaskPage>
               : "Unable to save task 😞",
           exception: e,
         ).show(context);
+        Navigator.of(context).pop(true);
       }
     }
   }

@@ -1,10 +1,8 @@
 import 'package:fari/app/custom_widgets/common_widgets/add_button.dart';
-import 'package:fari/app/custom_widgets/common_widgets/sort_tasks_bottom_sheet.dart';
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/top_bar/search_bar.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
-import 'package:fari/app/custom_widgets/top_bar/top_bar_button.dart';
-import 'package:fari/app/hex_color.dart';
+import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/category_page/category_page_model.dart';
@@ -13,9 +11,10 @@ import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
-class CategoryPage extends StatelessWidget {
+class CategoryPage extends StatefulWidget {
   CategoryPage({
     @required this.model,
     @required
@@ -88,7 +87,36 @@ class CategoryPage extends StatelessWidget {
     );
   }
 
-  /// Build methood
+  @override
+  _CategoryPageState createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  /// Build method
+
+  void dispose() {
+    super.dispose();
+    banner?.dispose();
+  }
+
+  BannerAd banner;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+
+    adState.initalization.then((status) {
+      setState(() {
+        banner = BannerAd(
+            adUnitId: adState.bannerAdUnitId,
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: adState.adListener)
+          ..load();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +135,7 @@ class CategoryPage extends StatelessWidget {
           _buildContent(context),
           AddButton(
             onTap: () => EditTaskPage.show(context,
-                category: category, database: database),
+                category: widget.category, database: widget.database),
           ),
         ],
       ),
@@ -118,8 +146,8 @@ class CategoryPage extends StatelessWidget {
     return TopBar.searchBarOnly(
       context,
       SearchBar(
-          hintText: "Search tasks in '${category.name}'",
-          onChanged: model.updateSearch),
+          hintText: "Search tasks in '${widget.category.name}'",
+          onChanged: widget.model.updateSearch),
     );
     // return TopBar(
     //   category: category,
@@ -171,6 +199,18 @@ class CategoryPage extends StatelessWidget {
         SizedBox(
           height: 20.0,
         ),
+        if (banner == null)
+          SizedBox(
+            height: 50,
+          )
+        else
+          Container(
+              margin: EdgeInsets.only(left: 20.0, right: 20.0),
+              height: 50,
+              child: AdWidget(ad: banner)),
+        SizedBox(
+          height: 20.0,
+        ),
         _buildTasks(),
         SizedBox(
           height: 150.0,
@@ -191,7 +231,7 @@ class CategoryPage extends StatelessWidget {
                 Wrap(
                   children: [
                     Text(
-                      category.name,
+                      widget.category.name,
                       style: Theme.of(context).textTheme.headline6.copyWith(
                             color: Colors.black.withAlpha(200),
                             fontWeight: FontWeight.w700,
@@ -201,8 +241,8 @@ class CategoryPage extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  (tasks.length.toString() ?? "No ") +
-                      (tasks.length == 1 ? " task" : " tasks"),
+                  (widget.tasks.length.toString() ?? "No ") +
+                      (widget.tasks.length == 1 ? " task" : " tasks"),
                   style: Theme.of(context).textTheme.headline6.copyWith(
                         color: Colors.black.withAlpha(150),
                         fontWeight: FontWeight.w400,
@@ -215,7 +255,7 @@ class CategoryPage extends StatelessWidget {
           GestureDetector(
             onTap: () {
               EditCategoryPage.show(context,
-                  category: category, database: database);
+                  category: widget.category, database: widget.database);
             },
             child: Container(
               height: 40.0,
@@ -302,7 +342,7 @@ class CategoryPage extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           EditCategoryPage.show(context,
-              category: category, database: database);
+              category: widget.category, database: widget.database);
         },
         child: Container(
           height: 60.0,
@@ -331,21 +371,19 @@ class CategoryPage extends StatelessWidget {
     return ListView.builder(
         shrinkWrap: true,
         physics: ClampingScrollPhysics(),
-        itemCount: tasks.length,
+        itemCount: widget.tasks.length,
         itemBuilder: (context, index) =>
             // I'M SO HAPPY LMAOOO ONLY SHOW TASKS THAT MATCH UP BY NAME BRO I AS TRYING TO QUERY THE WHOLE DAMN DATABASE OMG THANK GOD I REALIZED THIS WAY WORKS TOO OMG IM SO HAPPY BC I REALIZED THAT BECAUSE WE RESET THE PAGE EACH TIME, THE MODEL AUTOMATICALLY QUERIES EACH TIME WE SEARCH SOMETHING NEW UP (BAD BAD BAD)
-            tasks[index]
-                        .name
+            widget.tasks[index].name
                         .toLowerCase()
-                        .contains(model.search.toLowerCase()) ||
-                    (tasks[index].description != null &&
-                        tasks[index]
-                            .description
+                        .contains(widget.model.search.toLowerCase()) ||
+                    (widget.tasks[index].description != null &&
+                        widget.tasks[index].description
                             .toLowerCase()
-                            .contains(model.search.toLowerCase()))
+                            .contains(widget.model.search.toLowerCase()))
                 ? TaskWidget(
-                    task: tasks[index],
-                    database: database,
+                    task: widget.tasks[index],
+                    database: widget.database,
                     showDate: true,
                   )
                 : Container());
