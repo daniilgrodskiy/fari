@@ -285,6 +285,7 @@ class _HomePageState extends State<HomePage>
         // Date timeline
         Container(
           // padding: EdgeInsets.symmetric(vertical: 10.0),
+          height: 100.0,
           margin: EdgeInsets.symmetric(horizontal: 20.0),
           decoration: BoxDecoration(
               color: Colors.white,
@@ -295,8 +296,10 @@ class _HomePageState extends State<HomePage>
                     offset: Offset(0.0, 10.0),
                     blurRadius: 5.0),
               ]),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
+          child: ListView(
+            // mainAxisSize: MainAxisSize.max,
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
             children: _buildTimelineDay(),
           ),
         ),
@@ -564,25 +567,28 @@ class _HomePageState extends State<HomePage>
 
   List<Widget> _buildTimelineDay() {
     List<Widget> dayWidgets = [];
-    int sunday = 7;
-    DateTime currentDate = new DateTime.now();
+    DateTime currentDate = new DateTime.now().subtract(new Duration(days: 2));
 
-    while (currentDate.weekday != sunday) {
-      currentDate = currentDate.subtract(new Duration(days: 1));
-    }
+    // Originally only showed 1 week, starting on Sunday
+    // int sunday = 7;
+    // while (currentDate.weekday != sunday) {
+    //   currentDate = currentDate.subtract(new Duration(days: 1));
+    // }
 
     // DateTime end = currentDate.add(Duration(days: 7));
 
-    for (int i = 0; i < 7; i++) {
-      dayWidgets.add(new TimelineWidget(
-        onTap: () {
-          _animationController.reset();
-          _animationController.forward();
-        },
-        currentDate: currentDate,
-        model: model,
-        tasksPerDay: _tasksPerDay,
-      ));
+    for (int i = 0; i < 17; i++) {
+      dayWidgets.add(
+        new TimelineWidget(
+          onTap: () {
+            _animationController.reset();
+            _animationController.forward();
+          },
+          currentDate: currentDate,
+          model: model,
+          tasksPerDay: _tasksPerDay,
+        ),
+      );
       currentDate = currentDate.add(Duration(days: 1));
     }
 

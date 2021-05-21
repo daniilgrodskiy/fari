@@ -134,8 +134,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
 
       if (isQuitting) {
         await model.deleteCategory(category);
-        // Pop twice???
-        Navigator.of(context).pop();
+        // Pop twice!
+        Navigator.of(context)..pop()..pop();
       }
     } on PlatformException catch (e) {
       model.updateWith(isLoading: false);

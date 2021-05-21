@@ -35,54 +35,67 @@ class CategoryPage extends StatefulWidget {
     // Get category
     await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(builder: (context) {
-        return StreamBuilder<Category>(
-            stream: database.categoryStream(categoryId: category.id),
-            builder: (context, categorySnapshot) {
-              if (categorySnapshot.hasError) {
-                // Will only show when Category has been deleted
-                return Scaffold(
-                  appBar: TopBar(
-                    hasBackButton: true,
-                  ),
-                  body: Center(
-                    child: Text(
-                      "Error retrieving category.",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline6.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                            fontSize: 15.0,
-                          ),
-                    ),
-                  ),
+        // return StreamBuilder<Category>(
+        //     stream: database.categoryStream(categoryId: category.id),
+        //     builder: (context, categorySnapshot) {
+        //       if (categorySnapshot.hasError) {
+        //         // Will only show when Category has been deleted
+        //         return Scaffold(
+        //           appBar: TopBar(
+        //             hasBackButton: true,
+        //           ),
+        //           body: Center(
+        //             child: Text(
+        //               "Error retrieving category.",
+        //               textAlign: TextAlign.center,
+        //               style: Theme.of(context).textTheme.headline6.copyWith(
+        //                     fontWeight: FontWeight.w500,
+        //                     color: Colors.black,
+        //                     fontSize: 15.0,
+        //                   ),
+        //             ),
+        //           ),
+        //         );
+        //       }
+        //       if (categorySnapshot.hasData) {
+        // Get tasks
+        return StreamBuilder<List<Task>>(
+            stream: database.tasksStream(categoryId: category.id),
+            builder: (context, tasksSnapshot) {
+              if (tasksSnapshot.hasData) {
+                return ChangeNotifierProvider<CategoryPageModel>(
+                  create: (context) => CategoryPageModel(),
+                  child:
+                      Consumer<CategoryPageModel>(builder: (context, model, _) {
+                    // return CategoryPage();
+                    return CategoryPage(
+                      database: database,
+                      model: model,
+                      tasks: tasksSnapshot.data,
+                      category: new Category(
+                          id: "2020-12-31T02:07:36.887095",
+                          name: "School",
+                          color: "2ecc71"),
+                      // category: categorySnapshot.data,
+                    );
+                  }),
                 );
               }
-              if (categorySnapshot.hasData) {
-                // Get tasks
-                return StreamBuilder<List<Task>>(
-                    stream: database.tasksStream(categoryId: category.id),
-                    builder: (context, tasksSnapshot) {
-                      if (tasksSnapshot.hasData) {
-                        return ChangeNotifierProvider<CategoryPageModel>(
-                          create: (context) => CategoryPageModel(),
-                          child: Consumer<CategoryPageModel>(
-                              builder: (context, model, _) {
-                            // return CategoryPage();
-                            return CategoryPage(
-                              database: database,
-                              model: model,
-                              tasks: tasksSnapshot.data,
-                              // category: ,
-                              category: categorySnapshot.data,
-                            );
-                          }),
-                        );
-                      }
-                      return Container();
-                    });
-              }
-              return Container();
+              return Scaffold(
+                resizeToAvoidBottomInset: false,
+                extendBodyBehindAppBar: true,
+                // appBar: _buildTopBar(context),
+                backgroundColor: Colors.grey[50],
+              );
             });
+        //   }
+        //   return Scaffold(
+        //     resizeToAvoidBottomInset: false,
+        //     extendBodyBehindAppBar: true,
+        //     // appBar: _buildTopBar(context),
+        //     backgroundColor: Colors.grey[50],
+        //   );
+        // });
       }),
     );
   }
@@ -149,44 +162,6 @@ class _CategoryPageState extends State<CategoryPage> {
           hintText: "Search tasks in '${widget.category.name}'",
           onChanged: widget.model.updateSearch),
     );
-    // return TopBar(
-    //   category: category,
-    //   searchBar: SearchBar(hintText: "Search tasks", onChanged: model.updateSearch,),
-    //   hasBackButton: true,
-    //   actions: <TopBarButton>[
-    //     TopBarButton(
-    //       text: "Sort",
-    //       icon: FontAwesomeIcons.sort,
-    //       onTap: () {
-    //         showModalBottomSheet(
-    //           context: context,
-    //           backgroundColor: Colors.transparent,
-    //           useRootNavigator: true,
-    //           builder: (context) => SortTasksBottomSheet(
-    //             showCategoryOption: false,
-    //             currentSortType: model.sortType,
-    //             onTap: (newSortType) {
-    //               Navigator.pop(context);
-    //               model.updateSortType(newSortType);
-    //             },
-    //           )
-    //         );
-    //       }
-    //     ),
-    //     TopBarButton(
-    //       text: "Edit",
-    //       icon: FontAwesomeIcons.pencilAlt,
-    //       onTap: () {
-    //         return EditCategoryPage.show(context, category: category, database: database);
-    //         // I was trying to retreive a boolean value from EditCategoryPage(...), but it fell flat :|
-    //         // final isDeleted = await EditCategoryPage.show(context, category: category, database: database);
-    //         // If 'isDeleted' is true, that means that the task has been deleted!
-    //         // if (isDeleted == true)
-    //         //   Navigator.pop(context);
-    //       }
-    //     ),
-    //   ],
-    // );
   }
 
   Widget _buildContent(BuildContext context) {

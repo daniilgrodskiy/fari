@@ -8,7 +8,6 @@ import 'package:fari/services/auth.dart';
 // import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -22,18 +21,11 @@ void main() async {
       ));
 
   await Firebase.initializeApp();
-  // await FirebaseAdMob.instance
-  //     .initialize(appId: "ca-app-pub-3446106133887966~5236144498");
-
-  // await MobileAds.initialize(
-  //   useHybridComposition: true,
-  //   nativeAdUnitId: "ca-app-pub-3446106133887966/3808965450",
-  // );
 
   final appleSignInAvailable = await AppleSignInAvailable.check();
 
-  final initFuture = MobileAds.instance.initialize();
-  final adState = AdState(initFuture);
+  final adsInit = MobileAds.instance.initialize();
+  final adState = AdState(adsInit);
 
   runApp(Provider<AppleSignInAvailable>.value(
     value: appleSignInAvailable,

@@ -13,55 +13,53 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class CalendarPage extends StatefulWidget {
-
-  CalendarPage({
-    this.tasks
-  });
+  CalendarPage({this.tasks});
 
   final List<Task> tasks;
-
 
   @override
   _CalendarPageState createState() => _CalendarPageState();
 
-  static Future<void> show(BuildContext context) async  {
+  static Future<void> show(BuildContext context) async {
     final database = Provider.of<Database>(context, listen: false);
 
-    await Navigator.of(context).push(
-      MaterialPageRoute(
+    await Navigator.of(context).push(MaterialPageRoute(
         fullscreenDialog: true,
         builder: (context) {
           return StreamBuilder<List<Task>>(
-            stream: database.tasksStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final tasks = snapshot.data;
-                tasks.sort(TaskSortMethods.dueDate);
-                return CalendarPage(tasks: tasks);
-              }
-              return Container();
-            }
-          );
-        }
-      )
-    );
+              stream: database.tasksStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final tasks = snapshot.data;
+                  tasks.sort(TaskSortMethods.dueDate);
+                  return CalendarPage(tasks: tasks);
+                }
+                return Container();
+              });
+        }));
   }
 }
 
-class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderStateMixin {
-
+class _CalendarPageState extends State<CalendarPage>
+    with SingleTickerProviderStateMixin {
   /// Instance variables
-    
+
   DateTime _selectedDate = new DateTime.now();
   double _scrollOffset = 1.0;
+
   /// Getter methods
 
   List<Task> get tasks => widget.tasks;
 
-
   /// Stateful methods
-  
 
+  @override
+  void dispose() {
+    super.dispose();
+    // Turn status bar color back to white
+    FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+  }
 
   /// Build method
 
@@ -80,10 +78,11 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Transform.scale(
-              scale: (-1 / 6) * (1 - _scrollOffset) + 1, 
+              scale: (-1 / 6) * (1 - _scrollOffset) + 1,
               // Squeezed the function so that the two points on this linear graph are are (0.0, 1.0) and (0.6, 0.9)
               // This makes the _scrollOffset still occur while squeezing the scale into a range!
-              child: ClipRRect( // Clips the body so that we the Container will have rounded corners
+              child: ClipRRect(
+                // Clips the body so that we the Container will have rounded corners
                 borderRadius: BorderRadius.circular(20),
                 child: Scaffold(
                   backgroundColor: Colors.blueGrey[50],
@@ -91,9 +90,8 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
                   body: Stack(
                     children: [
                       Container(
-                        margin: EdgeInsets.only(top: 20.0),
-                        child: _buildCalendar(context)
-                      ),
+                          margin: EdgeInsets.only(top: 20.0),
+                          child: _buildCalendar(context)),
                     ],
                   ),
                 ),
@@ -126,7 +124,8 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
                 // minChildSize: 0.35,
                 // initialChildSize: 0.5,
                 // maxChildSize: 0.95,
-                builder: (BuildContext context, ScrollController scrollController) {
+                builder:
+                    (BuildContext context, ScrollController scrollController) {
                   return _buildContent(context, database, scrollController);
                 },
               ),
@@ -137,7 +136,6 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
       ),
     );
   }
-
 
   Widget _buildTopBar() {
     // return TopBar.empty();
@@ -151,19 +149,19 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
       title: "Calendar",
       // actions: <TopBarButton>[
       //   TopBarButton(
-      //     text: "Daily", 
+      //     text: "Daily",
       //       icon: FontAwesomeIcons.solidClock,
       //       onTap: () {}
       //     ),
       //   TopBarButton(
-      //     text: "Calendar", 
+      //     text: "Calendar",
       //     icon: FontAwesomeIcons.solidCalendarAlt,
       //     onTap: () {}
       //   ),
       // ],
     );
   }
-  
+
   static const double minExtent = 0.35;
   static const double maxExtent = 0.92;
 
@@ -181,30 +179,38 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
     }
   }
 
-  Widget _buildContent(BuildContext context, Database database, ScrollController scrollController, ) {
+  Widget _buildContent(
+    BuildContext context,
+    Database database,
+    ScrollController scrollController,
+  ) {
     draggableSheetContext = context;
 
     return Container(
       decoration: BoxDecoration(
-      color: Colors.blueGrey[50],
-      borderRadius: BorderRadius.only(topLeft:  Radius.circular(20.0), topRight: Radius.circular(20.0)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withAlpha(50),
-          blurRadius: 10.0,
-          spreadRadius: 5.0,
-        )
-      ]
-    ),
+          color: Colors.blueGrey[50],
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(50),
+              blurRadius: 10.0,
+              spreadRadius: 5.0,
+            )
+          ]),
       child: Stack(
         children: <Widget>[
           ListView(
             controller: scrollController,
             physics: ClampingScrollPhysics(),
             children: <Widget>[
-              SizedBox(height: 50.0,),
+              SizedBox(
+                height: 50.0,
+              ),
               _buildTasks(scrollController, database),
-              SizedBox(height: 200.0,),
+              SizedBox(
+                height: 200.0,
+              ),
             ],
           ),
           _buildSheetHeader(scrollController),
@@ -214,28 +220,27 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
   }
 
   Widget _buildTasks(ScrollController scrollController, Database database) {
-     return ListView.builder(
-      // controller: scrollController,
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {                       
-        if (tasks[index].day != null) {
-          // Only show the task if it has a date
-          if (
-            tasks[index].day.year == _selectedDate.year &&
-            tasks[index].day.month == _selectedDate.month &&
-            tasks[index].day.day == _selectedDate.day
-          ) {
-            // Only show the tasks that match up with the selected date
-            return TaskWidget(task: tasks[index], database: database,);
+    return ListView.builder(
+        // controller: scrollController,
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          if (tasks[index].day != null) {
+            // Only show the task if it has a date
+            if (tasks[index].day.year == _selectedDate.year &&
+                tasks[index].day.month == _selectedDate.month &&
+                tasks[index].day.day == _selectedDate.day) {
+              // Only show the tasks that match up with the selected date
+              return TaskWidget(
+                task: tasks[index],
+                database: database,
+              );
+            }
           }
-        }
-        return Container();
-      }
-    );
+          return Container();
+        });
   }
-
 
   Widget _buildSheetHeader(ScrollController scrollController) {
     return SingleChildScrollView(
@@ -244,9 +249,13 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
       child: Column(
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(bottom: 20.0,),
+            margin: EdgeInsets.only(
+              bottom: 20.0,
+            ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0)),
               color: Colors.blueGrey[50],
               // boxShadow: [
               //   BoxShadow(
@@ -260,31 +269,38 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
             height: 90.0, // TODO: Hardcoded pixel value. Dangerous?
             child: Column(
               children: <Widget>[
-                SizedBox(height: 20.0,),
+                SizedBox(
+                  height: 20.0,
+                ),
                 Align(
                   alignment: Alignment.topCenter,
                   child: Container(
                     height: 8.0,
                     width: 80.0,
-                    decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(10.0)),
+                    decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(10.0)),
                   ),
                 ),
-                SizedBox(height: 10.0,),
+                SizedBox(
+                  height: 10.0,
+                ),
                 Row(
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.only(left: 20),
                       child: Text(
-                        'Tasks', 
+                        'Tasks',
                         style: Theme.of(context).textTheme.headline6.copyWith(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.w700,
-                        ),
+                              fontSize: 25.0,
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                     ),
                     Spacer(),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 10.0),
                       margin: EdgeInsets.only(right: 20.0),
                       decoration: BoxDecoration(
                         color: Colors.indigo[900],
@@ -294,10 +310,9 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
                         // DateFormat.MMMd().format(task.day) + " @ " + DateFormat.MMMd().format(task.time),
                         DateFormat.MMMMEEEEd().format(_selectedDate),
                         style: Theme.of(context).textTheme.headline6.copyWith(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white
-                        ),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
                     ),
                   ],
@@ -347,46 +362,42 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
         todayButtonColor: Colors.red[400],
         // Styles
         headerTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 35.0,
-        ),
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 35.0,
+            ),
         weekdayTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.indigo[200],
-          fontWeight: FontWeight.w800,
-          fontSize: dayFontSize
-        ),
+            color: Colors.indigo[200],
+            fontWeight: FontWeight.w800,
+            fontSize: dayFontSize),
         daysTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: dayFontSize
-        ),
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: dayFontSize),
         weekendTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: dayFontSize
-        ),
-        inactiveDaysTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontSize: dayFontSize
-        ),
-        selectedDayTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontSize: dayFontSize
-        ),
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: dayFontSize),
+        inactiveDaysTextStyle: Theme.of(context)
+            .textTheme
+            .headline6
+            .copyWith(color: Colors.white, fontSize: dayFontSize),
+        selectedDayTextStyle: Theme.of(context)
+            .textTheme
+            .headline6
+            .copyWith(color: Colors.white, fontSize: dayFontSize),
         prevDaysTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white24,
-          fontWeight: FontWeight.w300,
-          fontSize: dayFontSize
-        ),
+            color: Colors.white24,
+            fontWeight: FontWeight.w300,
+            fontSize: dayFontSize),
         nextDaysTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white24,
-          fontSize: dayFontSize,
-        ),
-        todayTextStyle: Theme.of(context).textTheme.headline6.copyWith(
-          color: Colors.white,
-          fontSize: dayFontSize
-        ),
+              color: Colors.white24,
+              fontSize: dayFontSize,
+            ),
+        todayTextStyle: Theme.of(context)
+            .textTheme
+            .headline6
+            .copyWith(color: Colors.white, fontSize: dayFontSize),
         // Buttons
         leftButtonIcon: _buildTopButton(FontAwesomeIcons.arrowLeft),
         rightButtonIcon: _buildTopButton(FontAwesomeIcons.arrowRight),
@@ -415,7 +426,11 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
         // shape: BoxShape.circle,
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Icon(icon, color: Colors.white, size: 15.0,),
+      child: Icon(
+        icon,
+        color: Colors.white,
+        size: 15.0,
+      ),
     );
   }
 }

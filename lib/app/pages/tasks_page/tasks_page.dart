@@ -25,10 +25,10 @@ class TasksPage extends StatefulWidget {
   final List<Task> tasks;
 
   // 'create' instead of 'show' purely because we aren't ever NAVIGATING to this page; only can reach it from the bottom tab bar so it'd never be a 'show' through a navigator <--- Not true anymore, but for reference I'll keep it! :)
-  static Widget show(BuildContext context, Database database) {
+  static Future<void> show(BuildContext context, Database database) async {
     // final database = Provider.of<Database>(context, listen: false);
 
-    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+    await Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
         // fullscreenDialog: true,
         builder: (context) => StreamBuilder<List<Task>>(
             // IMPORTANT: Wrapping the page in this StreamBuilder so that the stream to get all the tasks doesn't get called EVERY time we type something into the search query.
@@ -51,28 +51,6 @@ class TasksPage extends StatefulWidget {
               }
               return Container();
             })));
-
-    return StreamBuilder<List<Task>>(
-        // IMPORTANT: Wrapping the page in this StreamBuilder so that the stream to get all the tasks doesn't get called EVERY time we type something into the search query.
-        // TODO: However, I don't know if Firestore accounts for this^ and thus, lowers the number of queries. This is worth a look to make sure that the above statement is true. If it's not, then I DON'T need to keep wrapping some of these classes with a StreamBuilder.
-        stream: database.tasksStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final tasks = snapshot.data;
-
-            return ChangeNotifierProvider<TasksPageModel>(
-              create: (context) => TasksPageModel(),
-              child: Consumer<TasksPageModel>(builder: (context, model, _) {
-                return TasksPage(
-                  database: database,
-                  model: model,
-                  tasks: tasks,
-                );
-              }),
-            );
-          }
-          return Container();
-        });
   }
 
   @override
@@ -325,7 +303,7 @@ class _TasksPageState extends State<TasksPage> {
           child: Text(
         widget.model.search != null
             ? "No tasks found"
-            : "Click the plus button below to create your first task!",
+            : "Go to the home page to add your first task!",
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headline6.copyWith(
             fontSize: 20.0, fontWeight: FontWeight.w200, color: Colors.white),

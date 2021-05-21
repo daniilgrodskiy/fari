@@ -156,15 +156,6 @@ class _TaskWidgetState extends State<TaskWidget>
         duration: Duration(milliseconds: 100),
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          // border: Border.all(
-          //   color: task.isCompleted
-          //   ? Colors.green[100]
-          //   : (task.day != null)
-          //     ? isMissed(task.day, task.time)
-          //       ? Colors.red[100]
-          //       : Colors.white
-          //     : Colors.white
-          // ),
           color: task.isCompleted
               ? Colors.green[100]
               : (task.day != null)
