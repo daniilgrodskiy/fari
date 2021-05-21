@@ -66,22 +66,6 @@ class _TasksPageState extends State<TasksPage> {
     banner?.dispose();
   }
 
-<<<<<<< HEAD
-=======
-  @override
-  _TasksPageState createState() => _TasksPageState();
-}
-
-class _TasksPageState extends State<TasksPage> {
-  /// Build method
-
-  @override
-  void dispose() {
-    super.dispose();
-    banner?.dispose();
-  }
-
->>>>>>> e5498c0b01241ea00086ab872765587f34a7a9b7
   BannerAd banner;
 
   @override
