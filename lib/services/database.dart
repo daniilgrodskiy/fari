@@ -55,7 +55,11 @@ class FirestoreDatabase implements Database {
       );
 
   @override
-  Future<void> setTask(Task task) async => await _service.setData(
+  Future<void> setTask(Task task) async {
+    // int allTasksLength = await tasksStream().length;
+
+    // if (allTasksLength < 22) {
+      await _service.setData(
         path: APIPath.task(uid, task.id),
         data: task.toMap(),
         // TODO: If task.hasReminder, add it to 'reminders'
@@ -64,6 +68,8 @@ class FirestoreDatabase implements Database {
         //  -> if not found then add new reminder cron job
         //  -> if found, then edit it to either say 'cancelled' or delete it altogether
       );
+    // }
+  }
 
   @override
   Future<void> deleteTask(Task task) async {
@@ -71,14 +77,13 @@ class FirestoreDatabase implements Database {
 
     // Delete any reminders with that task too
     try {
-        // See if the reminder actually exists (might have been already deleted)
-        await _service.deleteData(
-          path: APIPath.reminder(task.id),
-        );
-      } catch (e) {
-        print(e);
-      }
-
+      // See if the reminder actually exists (might have been already deleted)
+      await _service.deleteData(
+        path: APIPath.reminder(task.id),
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   // CATEGORY METHODS

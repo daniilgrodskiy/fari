@@ -70,11 +70,11 @@ class HomePage extends StatefulWidget {
   }
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   /// Instance variables
 
   AnimationController _animationController;
+  AnimationController _categoriesAnimationController;
 
   Map<DateTime, int> _tasksPerDay = {};
   Map<String, int> _tasksPerCategory = {};
@@ -85,56 +85,27 @@ class _HomePageState extends State<HomePage>
   HomePageModel get model => widget.model;
 
   /// Stateful methods
-
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-  /// ADS
-  // final _nativeAdController = NativeAdmobController();
-  // StreamSubscription _subscription;
-  // double _height = 0;
-
-  // void _onStateChanged(AdLoadState state) {
-  //   switch (state) {
-  //     case AdLoadState.loading:
-  //       setState(() {
-  //         _height = 0;
-  //       });
-  //       break;
-
-  //     case AdLoadState.loadCompleted:
-  //       setState(() {
-  //         _height = 330;
-  //       });
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-  // }
-  /////////
-  ///
+  Animation<double> _categoriesAnimation;
 
   @override
   void initState() {
     super.initState();
-    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
 
     // Animation
     _animationController = new AnimationController(
         duration: new Duration(milliseconds: 200), vsync: this);
     _animationController.forward();
 
-    // Ads
-    // NativeAdmob(
-    //   type: NativeAdmobType.banner,
-    //   // factoryId: "testFactoryId",
-    //   adUnitID: "ca-app-pub-3446106133887966/6536853537",
-    //   // loading: Center(child: CircularProgressIndicator()),
-    //   // error: Container(),
-    // );
-    // ..load()
-    // ..show(anchorType: AnchorType.top);
+    _categoriesAnimationController = new AnimationController(
+        duration: new Duration(milliseconds: 500), vsync: this);
+    _categoriesAnimationController.forward();
+
+    _categoriesAnimation = CurvedAnimation(
+      parent: _categoriesAnimationController,
+      curve: Curves.easeOut,
+    );
 
     // Messaging
     try {
@@ -279,6 +250,7 @@ class _HomePageState extends State<HomePage>
         ),
         // Header
         _buildTopHeader(database),
+        _buildCategorySection(database),
         SizedBox(
           height: 20.0,
         ),
@@ -412,97 +384,153 @@ class _HomePageState extends State<HomePage>
         SizedBox(
           height: 20.0,
         ),
-        Row(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 20.0),
-              child: Text("Categories",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: Colors.black.withAlpha(200),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 25.0,
-                      )),
-            ),
-            SizedBox(
-              width: 10.0,
-            ),
-            GestureDetector(
-              onTap: () {
-                model.updateShowCategories(!model.showCategories);
-              },
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 100),
-                padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
-                decoration: BoxDecoration(
-                  color: model.showCategories
-                      ? Colors.red[400]
-                      : Colors.green[400],
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: Text(
-                  model.showCategories ? "Hide" : "Show",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6
-                      .copyWith(color: Colors.white, fontSize: 10.0),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 20.0,
-        ),
-        if (model.showCategories) _buildCategories(database),
-        SizedBox(
-          height: 10.0,
-        ),
-        if (banner == null)
-          SizedBox(
-            height: 50,
-          )
-        else
-          Container(
-              margin: EdgeInsets.only(left: 20.0, right: 20.0),
-              height: 50,
-              child: AdWidget(ad: banner)),
-        SizedBox(height: 20.0),
-        Row(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 20.0),
-              child: Text("Tasks",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: Colors.black.withAlpha(200),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 25.0,
-                      )),
-            ),
-            SizedBox(
-              width: 10.0,
-            ),
-            GestureDetector(
-              onTap: () {
-                TasksPage.show(context, database);
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
-                decoration: BoxDecoration(
-                  color: Colors.indigo[400],
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: Text(
-                  "View All",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6
-                      .copyWith(color: Colors.white, fontSize: 10.0),
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
+    );
+  }
+
+  Widget _buildCategorySection(Database database) {
+    return Column(children: [
+      Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(left: 20.0),
+            child: Text("Categories",
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                      color: Colors.black.withAlpha(200),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 25.0,
+                    )),
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+          GestureDetector(
+            onTap: () async {
+              if (model.showCategories) {
+                // TODO: Add an invisible container here that grows and shrinks to make the transition nicer!
+                await _categoriesAnimationController.reverse();
+                model.updateShowCategories(!model.showCategories);
+              } else {
+                model.updateShowCategories(!model.showCategories);
+                await _categoriesAnimationController.forward();
+              }
+            },
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 100),
+              padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+              decoration: BoxDecoration(
+                color:
+                    model.showCategories ? Colors.red[400] : Colors.green[400],
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: Text(
+                model.showCategories ? "Hide" : "Show",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6
+                    .copyWith(color: Colors.white, fontSize: 10.0),
+              ),
+            ),
+          ),
+        ],
+      ),
+      SizedBox(
+        height: 20.0,
+      ),
+      if (model.showCategories) _buildCategories(database),
+      SizedBox(
+        height: 10.0,
+      ),
+      if (banner == null)
+        SizedBox(
+          height: 50,
+        )
+      else
+        Container(
+            margin: EdgeInsets.only(left: 20.0, right: 20.0),
+            height: 50,
+            child: AdWidget(ad: banner)),
+      SizedBox(height: 20.0),
+      Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(left: 20.0),
+            child: Text("Tasks",
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                      color: Colors.black.withAlpha(200),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 25.0,
+                    )),
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+          GestureDetector(
+            onTap: () {
+              TasksPage.show(context, database);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+              decoration: BoxDecoration(
+                color: Colors.indigo[400],
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: Text(
+                "View All",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6
+                    .copyWith(color: Colors.white, fontSize: 10.0),
+              ),
+            ),
+          ),
+        ],
+      )
+    ]);
+  }
+
+  Widget _buildCategories(Database database) {
+    return FadeTransition(
+      opacity: _categoriesAnimation,
+      child: StreamBuilder<List<Category>>(
+          stream: database.categoriesStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final categories = snapshot.data;
+              // No tasks added yet
+              if (categories.isEmpty) {
+                return Center(
+                    // child: _buildNoCategoriesContainer(context)
+                    );
+              }
+              // Data loaded and exists
+              return Column(
+                children: <Widget>[
+                  Container(
+                    height: 200.0,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length + 1,
+                        itemBuilder: (context, index) {
+                          index = index - 1;
+                          if (index == -1) {
+                            return SizedBox(
+                              width: 30.0,
+                            );
+                          }
+                          return CategoryWidget(
+                              tasksPerCategory: _tasksPerCategory,
+                              category: categories[index],
+                              onTap: () => CategoryPage.create(context,
+                                  category: categories[index]));
+                        }),
+                  ),
+                ],
+              );
+            }
+            // Loading state
+            return Center(child: Container());
+          }),
     );
   }
 
@@ -703,47 +731,5 @@ class _HomePageState extends State<HomePage>
 
     // return DateFormat.MMMMEEEEd().format(date);
     return DateFormat.MMMMd().format(date);
-  }
-
-  Widget _buildCategories(Database database) {
-    return StreamBuilder<List<Category>>(
-        stream: database.categoriesStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final categories = snapshot.data;
-            // No tasks added yet
-            if (categories.isEmpty) {
-              return Center(
-                  // child: _buildNoCategoriesContainer(context)
-                  );
-            }
-            // Data loaded and exists
-            return Column(
-              children: <Widget>[
-                Container(
-                  height: 200.0,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length + 1,
-                      itemBuilder: (context, index) {
-                        index = index - 1;
-                        if (index == -1) {
-                          return SizedBox(
-                            width: 30.0,
-                          );
-                        }
-                        return CategoryWidget(
-                            tasksPerCategory: _tasksPerCategory,
-                            category: categories[index],
-                            onTap: () => CategoryPage.create(context,
-                                category: categories[index]));
-                      }),
-                ),
-              ],
-            );
-          }
-          // Loading state
-          return Center(child: Container());
-        });
   }
 }

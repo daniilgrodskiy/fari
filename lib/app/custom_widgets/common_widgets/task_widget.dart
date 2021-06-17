@@ -153,7 +153,7 @@ class _TaskWidgetState extends State<TaskWidget>
         EditTaskPage.show(context, task: task, database: database);
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 100),
+        duration: Duration(milliseconds: 200),
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: task.isCompleted
