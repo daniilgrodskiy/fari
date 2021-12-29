@@ -1,4 +1,4 @@
-import 'models/task.dart';
+import '../app/models/task.dart';
 
 class TaskSortMethods {
   // Methods to sort tasks

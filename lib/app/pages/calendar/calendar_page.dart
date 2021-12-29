@@ -3,7 +3,7 @@ import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar_button.dart';
 import 'package:fari/app/models/task.dart';
-import 'package:fari/app/task_sort_methods.dart';
+import 'package:fari/utils/task_sort_methods.dart';
 import 'package:fari/services/auth.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';

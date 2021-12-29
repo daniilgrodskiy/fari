@@ -1,4 +1,4 @@
-import 'package:fari/app/custom_widgets/useful_time_methods.dart';
+import 'package:fari/utils/useful_time_methods.dart';
 import 'package:fari/app/pages/home_page/home_page_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

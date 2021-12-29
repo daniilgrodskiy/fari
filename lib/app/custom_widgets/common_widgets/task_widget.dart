@@ -1,4 +1,4 @@
-import 'package:fari/app/custom_widgets/useful_time_methods.dart';
+import 'package:fari/utils/useful_time_methods.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../hex_color.dart';
+import '../../../utils/hex_color.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TaskWidget extends StatefulWidget {

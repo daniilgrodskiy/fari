@@ -6,7 +6,7 @@ import 'package:fari/app/custom_widgets/common_widgets/category_widget.dart';
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
-import 'package:fari/app/custom_widgets/useful_time_methods.dart';
+import 'package:fari/utils/useful_time_methods.dart';
 import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/models/task.dart';
@@ -16,7 +16,7 @@ import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
 import 'package:fari/app/pages/home_page/home_page_model.dart';
 import 'package:fari/app/pages/home_page/timeline_widget.dart';
 import 'package:fari/app/pages/tasks_page/tasks_page.dart';
-import 'package:fari/app/task_sort_methods.dart';
+import 'package:fari/utils/task_sort_methods.dart';
 import 'package:fari/services/auth.dart';
 import 'package:fari/services/database.dart';
 // import 'package:firebase_admob/firebase_admob.dart';
@@ -626,6 +626,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildTasks(Database database) {
+    print("Building and sorting tasks.");
+    // Sorting tasks
+    widget.tasks.sort(TaskSortMethods.dueDate);
+
     return FadeTransition(
       opacity: new Tween<double>(begin: 0.25, end: 1.0).animate(
           CurvedAnimation(parent: _animationController, curve: Curves.easeIn)),
@@ -634,8 +638,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           physics: ClampingScrollPhysics(),
           itemCount: tasks.length,
           itemBuilder: (context, index) {
-            bool isFirst = index ==
-                0; // Prevents extra space between "Tasks" heading and actual tasks
             return Column(
               children: <Widget>[
                 if (index == 0 ||
@@ -667,28 +669,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     fontSize: 20.0,
                                   )),
                         ),
-                        // SizedBox(width: 10.0),
                         Spacer(),
-                        // if (isFirst)
-                        //   GestureDetector(
-                        //     onTap: () {},
-                        //     child: Container(
-                        //       padding: EdgeInsets.symmetric(
-                        //           horizontal: 20.0, vertical: 10.0),
-                        //       decoration: BoxDecoration(
-                        //         color: Colors.indigo[400],
-                        //         borderRadius: BorderRadius.circular(5.0),
-                        //       ),
-                        //       child: Text(
-                        //         "Filter",
-                        //         style: Theme.of(context)
-                        //             .textTheme
-                        //             .headline6
-                        //             .copyWith(
-                        //                 color: Colors.white, fontSize: 15.0),
-                        //       ),
-                        //     ),
-                        //   ),
                         SizedBox(width: 20.0),
                       ],
                     ),

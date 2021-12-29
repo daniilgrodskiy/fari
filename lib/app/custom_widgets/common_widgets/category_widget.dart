@@ -1,4 +1,4 @@
-import 'package:fari/app/hex_color.dart';
+import 'package:fari/utils/hex_color.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

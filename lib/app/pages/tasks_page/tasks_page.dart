@@ -7,7 +7,7 @@ import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/task.dart';
 import 'package:fari/app/pages/edit_task_page.dart/edit_task_page.dart';
 import 'package:fari/app/pages/tasks_page/tasks_page_model.dart';
-import 'package:fari/app/task_sort_methods.dart';
+import 'package:fari/utils/task_sort_methods.dart';
 import 'package:fari/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';

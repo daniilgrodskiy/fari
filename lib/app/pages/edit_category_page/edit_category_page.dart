@@ -2,7 +2,7 @@ import 'package:fari/app/custom_widgets/common_widgets/custom_text_field.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_exception_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
-import 'package:fari/app/hex_color.dart';
+import 'package:fari/utils/hex_color.dart';
 import 'package:fari/app/models/category.dart';
 import 'package:fari/app/pages/edit_category_page/edit_category_page_model.dart';
 import 'package:fari/services/database.dart';

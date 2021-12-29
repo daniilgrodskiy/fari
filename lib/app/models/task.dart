@@ -1,4 +1,4 @@
-import 'package:fari/app/hex_color.dart';
+import 'package:fari/utils/hex_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
