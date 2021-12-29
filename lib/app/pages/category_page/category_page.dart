@@ -32,72 +32,100 @@ class CategoryPage extends StatefulWidget {
       {@required Category category}) async {
     final database = Provider.of<Database>(context, listen: false);
 
-    // Get category
-    await Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(builder: (context) {
-        // return StreamBuilder<Category>(
-        //     stream: database.categoryStream(categoryId: category.id),
-        //     builder: (context, categorySnapshot) {
-        //       if (categorySnapshot.hasError) {
-        //         // Will only show when Category has been deleted
-        //         return Scaffold(
-        //           appBar: TopBar(
-        //             hasBackButton: true,
-        //           ),
-        //           body: Center(
-        //             child: Text(
-        //               "Error retrieving category.",
-        //               textAlign: TextAlign.center,
-        //               style: Theme.of(context).textTheme.headline6.copyWith(
-        //                     fontWeight: FontWeight.w500,
-        //                     color: Colors.black,
-        //                     fontSize: 15.0,
-        //                   ),
-        //             ),
-        //           ),
-        //         );
-        //       }
-        //       if (categorySnapshot.hasData) {
-        // Get tasks
-        return StreamBuilder<List<Task>>(
+    await Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        builder: (context) => StreamBuilder<List<Task>>(
+
+            // FOUND IT!
+            // categoryId: category.id causes flickering!
             stream: database.tasksStream(categoryId: category.id),
-            builder: (context, tasksSnapshot) {
-              if (tasksSnapshot.hasData) {
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final tasks = snapshot.data;
                 return ChangeNotifierProvider<CategoryPageModel>(
                   create: (context) => CategoryPageModel(),
                   child:
                       Consumer<CategoryPageModel>(builder: (context, model, _) {
-                    // return CategoryPage();
                     return CategoryPage(
                       database: database,
                       model: model,
-                      tasks: tasksSnapshot.data,
+                      tasks: tasks,
                       category: new Category(
                           id: "2020-12-31T02:07:36.887095",
                           name: "School",
                           color: "2ecc71"),
-                      // category: categorySnapshot.data,
                     );
                   }),
                 );
               }
-              return Scaffold(
-                resizeToAvoidBottomInset: false,
-                extendBodyBehindAppBar: true,
-                // appBar: _buildTopBar(context),
-                backgroundColor: Colors.grey[50],
-              );
-            });
-        //   }
-        //   return Scaffold(
-        //     resizeToAvoidBottomInset: false,
-        //     extendBodyBehindAppBar: true,
-        //     // appBar: _buildTopBar(context),
-        //     backgroundColor: Colors.grey[50],
-        //   );
-        // });
-      }),
-    );
+              return Container();
+            })));
+
+    // Get category
+    // await Navigator.of(context, rootNavigator: true).push(
+    //   MaterialPageRoute(builder: (context) {
+    //     return StreamBuilder<Category>(
+    //         stream: database.categoryStream(categoryId: category.id),
+    //         builder: (context, categorySnapshot) {
+    //           if (categorySnapshot.hasError) {
+    //             // Will only show when Category has been deleted
+    //             return Scaffold(
+    //               appBar: TopBar(
+    //                 hasBackButton: true,
+    //               ),
+    //               body: Center(
+    //                 child: Text(
+    //                   "Error retrieving category.",
+    //                   textAlign: TextAlign.center,
+    //                   style: Theme.of(context).textTheme.headline6.copyWith(
+    //                         fontWeight: FontWeight.w500,
+    //                         color: Colors.black,
+    //                         fontSize: 15.0,
+    //                       ),
+    //                 ),
+    //               ),
+    //             );
+    //           }
+    //           if (categorySnapshot.hasData) {
+    //             // Get tasks
+    //             return StreamBuilder<List<Task>>(
+    //                 stream: database.tasksStream(categoryId: category.id),
+    //                 builder: (context, tasksSnapshot) {
+    //                   if (tasksSnapshot.hasData) {
+    //                     return ChangeNotifierProvider<CategoryPageModel>(
+    //                       create: (context) => CategoryPageModel(),
+    //                       child: Consumer<CategoryPageModel>(
+    //                           builder: (context, model, _) {
+    //                         // return CategoryPage();
+    //                         return CategoryPage(
+    //                           database: database,
+    //                           model: model,
+    //                           tasks: tasksSnapshot.data,
+    //                           // category: new Category(
+    //                           //     id: "2020-12-31T02:07:36.887095",
+    //                           //     name: "School",
+    //                           //     color: "2ecc71"),
+    //                           category: categorySnapshot.data,
+    //                         );
+    //                       }),
+    //                     );
+    //                   }
+    //                   return Scaffold(
+    //                     resizeToAvoidBottomInset: false,
+    //                     extendBodyBehindAppBar: true,
+    //                     // appBar: _buildTopBar(context),
+    //                     backgroundColor: Colors.grey[50],
+    //                   );
+    //                 });
+    //           }
+    //           return Scaffold(
+    //             resizeToAvoidBottomInset: false,
+    //             extendBodyBehindAppBar: true,
+    //             // appBar: _buildTopBar(context),
+    //             backgroundColor: Colors.grey[50],
+    //           );
+    //         });
+    //   }),
+    // );
   }
 
   @override
@@ -142,7 +170,6 @@ class _CategoryPageState extends State<CategoryPage> {
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: _buildTopBar(context),
-      backgroundColor: Colors.grey[50],
       body: Stack(
         children: <Widget>[
           _buildContent(context),
@@ -348,7 +375,7 @@ class _CategoryPageState extends State<CategoryPage> {
         physics: ClampingScrollPhysics(),
         itemCount: widget.tasks.length,
         itemBuilder: (context, index) =>
-            // I'M SO HAPPY LMAOOO ONLY SHOW TASKS THAT MATCH UP BY NAME BRO I AS TRYING TO QUERY THE WHOLE DAMN DATABASE OMG THANK GOD I REALIZED THIS WAY WORKS TOO OMG IM SO HAPPY BC I REALIZED THAT BECAUSE WE RESET THE PAGE EACH TIME, THE MODEL AUTOMATICALLY QUERIES EACH TIME WE SEARCH SOMETHING NEW UP (BAD BAD BAD)
+            // I'M SO HAPPY LMAOOO ONLY SHOW TASKS THAT MATCH UP BY NAME BRO I WAS TRYING TO QUERY THE WHOLE DAMN DATABASE OMG THANK GOD I REALIZED THIS WAY WORKS TOO OMG IM SO HAPPY BC I REALIZED THAT BECAUSE WE RESET THE PAGE EACH TIME, THE MODEL AUTOMATICALLY QUERIES EACH TIME WE SEARCH SOMETHING NEW UP (BAD BAD BAD)
             widget.tasks[index].name
                         .toLowerCase()
                         .contains(widget.model.search.toLowerCase()) ||

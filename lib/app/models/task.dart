@@ -100,6 +100,7 @@ class Task implements EventInterface {
     );
   }
 
+
   @override
   Widget getIcon() {
     // TODO: implement getIcon
@@ -109,6 +110,12 @@ class Task implements EventInterface {
   @override
   String getTitle() {
     // TODO: implement getTitle
+    throw UnimplementedError();
+  }
+
+  @override
+  int getId() {
+    // TODO: implement getId
     throw UnimplementedError();
   }
 }
