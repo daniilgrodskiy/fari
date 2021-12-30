@@ -52,57 +52,63 @@ class _TaskWidgetState extends State<TaskWidget>
   @override
   Widget build(BuildContext context) {
     return Slidable(
-      actionExtentRatio: 0.0,
-      // direction: DismissDirection.endToStart,
       key: Key(task.id),
-      actionPane: SlidableScrollActionPane(),
-      closeOnScroll: false,
-      secondaryActions: [
-        Container(
-          margin: EdgeInsets.symmetric(vertical: 10.0),
-          padding: EdgeInsets.only(left: 20.0),
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-              color: Colors.red[400],
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  bottomLeft: Radius.circular(20.0))),
-          child: Icon(
-            FontAwesomeIcons.trashAlt,
-            color: Colors.white,
-          ),
+      endActionPane: ActionPane(
+        dragDismissible: false,
+        // closeThreshold: 0.99,
+        extentRatio: 0.25,
+        motion: ScrollMotion(),
+        dismissible: DismissiblePane(
+          dismissThreshold: 0.999,
+          onDismissed: () {
+            final database = Provider.of<Database>(context, listen: false);
+            try {
+              database.deleteTask(task);
+              Scaffold.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                  elevation: 1.0,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  duration: Duration(seconds: 3),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.red[400],
+                  content: Text("\"${task.name}\" has been deleted"),
+                  margin: EdgeInsets.all(10.0),
+                ));
+            } catch (e) {
+              Scaffold.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  duration: Duration(seconds: 3),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.red[400],
+                  content: Text("Error: \"${task.name}\" was not deleted."),
+                  margin: EdgeInsets.all(10.0),
+                ));
+            }
+          },
         ),
-      ],
-      dismissal: SlidableDismissal(
-        child: SlidableDrawerDismissal(),
-        onDismissed: (actionType) {
-          final database = Provider.of<Database>(context, listen: false);
-          try {
-            database.deleteTask(task);
-            Scaffold.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                elevation: 1.0,
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                duration: Duration(seconds: 100),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.red[400],
-                content: Text("\"${task.name}\" has been deleted"),
-                margin: EdgeInsets.all(10.0),
-              ));
-          } catch (e) {
-            Scaffold.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                duration: Duration(seconds: 5),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.red[400],
-                content: Text("Error: \"${task.name}\" was not deleted."),
-                margin: EdgeInsets.all(10.0),
-              ));
-          }
-        },
+        children: [
+          Expanded(
+            child: Container(
+              width: 200,
+              margin: EdgeInsets.symmetric(vertical: 10.0),
+              padding: EdgeInsets.only(left: 20.0),
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                  color: Colors.red[400],
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      bottomLeft: Radius.circular(20.0))),
+              child: Icon(
+                FontAwesomeIcons.trashAlt,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
       child: AnimatedBuilder(
           animation: _animation,

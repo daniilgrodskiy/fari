@@ -34,13 +34,13 @@ class CategoryPage extends StatefulWidget {
 
     await Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
         builder: (context) => StreamBuilder<List<Task>>(
-
-            // FOUND IT!
-            // categoryId: category.id causes flickering!
+            // FOUND IT! -> 'categoryId: category.id' causes flickering!
             stream: database.tasksStream(categoryId: category.id),
+            // stream: database.tasksStream(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final tasks = snapshot.data;
+                // tasks.removeWhere((c) => c.categoryId != category.id);
                 return ChangeNotifierProvider<CategoryPageModel>(
                   create: (context) => CategoryPageModel(),
                   child:

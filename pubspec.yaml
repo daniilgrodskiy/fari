@@ -41,7 +41,7 @@ dependencies:
   sliding_up_panel: ^1.0.2
   sticky_infinite_list: ^1.3.0
   infinite_widgets: ^1.0.1
-  flutter_slidable: ^0.5.7
+  flutter_slidable: ^1.2.0
   apple_sign_in: ^0.1.0
   flutter_advertising_id: ^1.0.2
   # Firebase
