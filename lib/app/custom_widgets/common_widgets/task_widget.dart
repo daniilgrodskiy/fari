@@ -58,53 +58,53 @@ class _TaskWidgetState extends State<TaskWidget>
         // closeThreshold: 0.99,
         extentRatio: 0.25,
         motion: ScrollMotion(),
-        dismissible: DismissiblePane(
-          dismissThreshold: 0.999,
-          onDismissed: () {
-            final database = Provider.of<Database>(context, listen: false);
-            try {
-              database.deleteTask(task);
-              Scaffold.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  elevation: 1.0,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  duration: Duration(seconds: 3),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.red[400],
-                  content: Text("\"${task.name}\" has been deleted"),
-                  margin: EdgeInsets.all(10.0),
-                ));
-            } catch (e) {
-              Scaffold.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  duration: Duration(seconds: 3),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.red[400],
-                  content: Text("Error: \"${task.name}\" was not deleted."),
-                  margin: EdgeInsets.all(10.0),
-                ));
-            }
-          },
-        ),
+        dismissible:
+            DismissiblePane(dismissThreshold: 0.999, onDismissed: () {}),
         children: [
           Expanded(
-            child: Container(
-              width: 200,
-              margin: EdgeInsets.symmetric(vertical: 10.0),
-              padding: EdgeInsets.only(left: 20.0),
-              height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                  color: Colors.red[400],
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      bottomLeft: Radius.circular(20.0))),
-              child: Icon(
-                FontAwesomeIcons.trashAlt,
-                color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                try {
+                  widget.database.deleteTask(task);
+                  Scaffold.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      elevation: 1.0,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                      duration: Duration(seconds: 3),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.red[400],
+                      content: Text("\"${task.name}\" has been deleted"),
+                      margin: EdgeInsets.all(10.0),
+                    ));
+                } catch (e) {
+                  Scaffold.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      duration: Duration(seconds: 3),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.red[400],
+                      content: Text("Error: \"${task.name}\" was not deleted."),
+                      margin: EdgeInsets.all(10.0),
+                    ));
+                }
+              },
+              child: Container(
+                width: 200,
+                margin: EdgeInsets.symmetric(vertical: 10.0),
+                padding: EdgeInsets.only(left: 20.0),
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                    color: Colors.red[400],
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        bottomLeft: Radius.circular(20.0))),
+                child: Icon(
+                  FontAwesomeIcons.trashAlt,
+                  color: Colors.white,
+                ),
               ),
             ),
           )

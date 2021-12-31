@@ -37,7 +37,6 @@ class TasksPage extends StatefulWidget {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final tasks = snapshot.data;
-
                 return ChangeNotifierProvider<TasksPageModel>(
                   create: (context) => TasksPageModel(),
                   child: Consumer<TasksPageModel>(builder: (context, model, _) {
