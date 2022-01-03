@@ -288,23 +288,24 @@ class _EditTaskPageState extends State<EditTaskPage>
       VoidCallback onTap,
       String enabledText,
       String disabledText}) {
-    return Row(
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(left: 20.0, bottom: 15.0),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.headline6.copyWith(
-                  color: Colors.black.withAlpha(200),
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w500,
-                ),
+    return Container(
+      margin: EdgeInsets.only(bottom: 15.0),
+      child: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(left: 20.0, right: 10.0),
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.headline6.copyWith(
+                    color: Colors.black.withAlpha(200),
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
           ),
-        ),
-        if (isEnabled != null)
-          ToggleFieldButton(
-              isEnabled, onTap, enabledText ?? "Hide", disabledText ?? "Show")
-      ],
+          if (isEnabled != null) ToggleFieldButton(isEnabled, onTap)
+        ],
+      ),
     );
   }
 

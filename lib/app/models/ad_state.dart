@@ -5,7 +5,8 @@ class AdState {
 
   AdState(this.initalization);
 
-  String get bannerAdUnitId => "ca-app-pub-3940256099942544/2934735716";
+  // Test banner ad unit id: ca-app-pub-3940256099942544/2934735716
+  String get bannerAdUnitId => "ca-app-pub-3446106133887966/6536853537";
   String get nativeUnitId => "ca-app-pub-3940256099942544/3986624511";
 
   BannerAdListener get adListener => BannerAdListener(

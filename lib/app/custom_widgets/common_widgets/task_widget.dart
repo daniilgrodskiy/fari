@@ -58,8 +58,8 @@ class _TaskWidgetState extends State<TaskWidget>
         // closeThreshold: 0.99,
         extentRatio: 0.25,
         motion: ScrollMotion(),
-        dismissible:
-            DismissiblePane(dismissThreshold: 0.999, onDismissed: () {}),
+        // dismissible:
+        //     DismissiblePane(dismissThreshold: 0.999, onDismissed: () {}),
         children: [
           Expanded(
             child: GestureDetector(
@@ -69,9 +69,9 @@ class _TaskWidgetState extends State<TaskWidget>
                   Scaffold.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(SnackBar(
-                      elevation: 1.0,
+                      elevation: 2.0,
                       padding: EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
+                          horizontal: 20.0, vertical: 20.0),
                       duration: Duration(seconds: 3),
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.red[400],
@@ -162,6 +162,15 @@ class _TaskWidgetState extends State<TaskWidget>
         duration: Duration(milliseconds: 200),
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
+          border: Border.all(
+              width: 1.0,
+              color: task.isCompleted
+                  ? Colors.green[200]
+                  : (task.day != null)
+                      ? isMissed(task.day, task.time)
+                          ? Colors.red[200]
+                          : Colors.transparent
+                      : Colors.transparent),
           color: task.isCompleted
               ? Colors.green[100]
               : (task.day != null)
@@ -173,15 +182,15 @@ class _TaskWidgetState extends State<TaskWidget>
           boxShadow: [
             BoxShadow(
                 color: task.isCompleted
-                    ? Colors.green.withAlpha(30)
+                    ? Colors.green.withAlpha(50)
                     : (task.day != null)
                         ? isMissed(task.day, task.time)
-                            ? Colors.red.withAlpha(30)
+                            ? Colors.red.withAlpha(50)
                             : Colors.black.withAlpha(30)
                         : Colors.black.withAlpha(30),
-                offset: Offset(0.0, 10.0),
-                blurRadius: 10.0,
-                spreadRadius: -5.0),
+                offset: Offset(0.0, 5.0),
+                blurRadius: 5.0,
+                spreadRadius: -3.0),
           ],
         ),
         margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),

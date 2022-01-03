@@ -6,6 +6,7 @@ import 'package:fari/app/custom_widgets/common_widgets/category_widget.dart';
 import 'package:fari/app/custom_widgets/common_widgets/task_widget.dart';
 import 'package:fari/app/custom_widgets/platform_widgets/platform_alert_dialog.dart';
 import 'package:fari/app/custom_widgets/top_bar/top_bar.dart';
+import 'package:fari/app/pages/edit_task_page.dart/toggle_field_button.dart';
 import 'package:fari/utils/useful_time_methods.dart';
 import 'package:fari/app/models/ad_state.dart';
 import 'package:fari/app/models/category.dart';
@@ -25,9 +26,11 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_native_admob/flutter_native_admob.dart';
 // import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:aurora/aurora.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({
@@ -250,6 +253,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         // Header
         _buildTopHeader(database),
+        _buildSupportButton(),
+        SizedBox(
+          height: 20.0,
+        ),
         _buildCategorySection(database),
         SizedBox(
           height: 20.0,
@@ -404,53 +411,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           SizedBox(
             width: 10.0,
           ),
-          GestureDetector(
-            onTap: () async {
-              if (model.showCategories) {
-                // TODO: Add an invisible container here that grows and shrinks to make the transition nicer!
-                await _categoriesAnimationController.reverse();
-                model.updateShowCategories(!model.showCategories);
-              } else {
-                model.updateShowCategories(!model.showCategories);
-                await _categoriesAnimationController.forward();
-              }
-            },
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 100),
-              padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
-              decoration: BoxDecoration(
-                color:
-                    model.showCategories ? Colors.red[400] : Colors.green[400],
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Text(
-                model.showCategories ? "Hide" : "Show",
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6
-                    .copyWith(color: Colors.white, fontSize: 10.0),
-              ),
-            ),
-          ),
+          ToggleFieldButton(model.showCategories, () async {
+            if (model.showCategories) {
+              // TODO: Add an invisible container here that grows and shrinks to make the transition nicer!
+              await _categoriesAnimationController.reverse();
+              model.updateShowCategories(!model.showCategories);
+            } else {
+              model.updateShowCategories(!model.showCategories);
+              await _categoriesAnimationController.forward();
+            }
+          }),
         ],
       ),
       SizedBox(
         height: 20.0,
       ),
       if (model.showCategories) _buildCategories(database),
+      // SizedBox(
+      //   height: _categoriesAnimation.value * 200,
+      // ),
       SizedBox(
         height: 10.0,
       ),
-      if (banner == null)
-        SizedBox(
-          height: 50,
-        )
-      else
-        Container(
-            margin: EdgeInsets.only(left: 20.0, right: 20.0),
-            height: 50,
-            child: AdWidget(ad: banner)),
-      SizedBox(height: 20.0),
+      // if (banner == null)
+      //   SizedBox(
+      //     height: 50,
+      //   )
+      // else
+      //   Container(
+      //       margin: EdgeInsets.only(left: 20.0, right: 20.0),
+      //       height: 50,
+      //       child: AdWidget(ad: banner)),
+      // SizedBox(height: 20.0),
       Row(
         children: <Widget>[
           Container(
@@ -591,6 +583,94 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     }
+  }
+
+  Widget _buildSupportButton() {
+    return Container(
+      // padding: EdgeInsets.all(20.0),
+      margin: EdgeInsets.symmetric(horizontal: 20.0),
+      height: 80.0,
+      decoration: BoxDecoration(
+          // color: Colors.indigo[300].withAlpha(50),
+          gradient: RadialGradient(
+            colors: [Colors.blue[800], Colors.blue[500], Colors.indigo[300]],
+            center: Alignment(0.6, -0.3),
+            // focal: Alignment(0.3, 0.1),
+            radius: 3.0,
+            // focalRadius: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(5.0)),
+      child: Stack(
+        children: [
+          // Positioned(
+          //     top: 0,
+          //     left: 50,
+          //     child: Aurora(
+          //       blur: 10.0,
+          //       size: 200,
+          //       colors: [
+          //         Colors.red,
+          //         Colors.indigo[400]
+          //         // Color(0xff64b3f4).withAlpha(50)
+          //       ],
+          //     )),
+          // Positioned(
+          //     top: 0,
+          //     right: 0,
+          //     child: Aurora(
+          //       blur: 10.0,
+          //       size: 100,
+          //       colors: [Colors.yellow, Colors.indigo[800]],
+          //     )),
+          // Positioned(
+          //     bottom: 0,
+          //     right: -100,
+          //     child: Aurora(
+          //       blur: 30.0,
+          //       size: 300,
+          //       colors: [Colors.indigo[200], Colors.indigo[700]],
+          //     )),
+          // Positioned(
+          //     bottom: 0,
+          //     left: -20,
+          //     child: Aurora(
+          //       blur: 30.0,
+          //       size: 200,
+          //       colors: [Colors.indigo, Colors.indigo[400]],
+          //     )),
+          // Positioned(
+          //   top: 20.0,
+          //   left: 20.0,
+          //   child: Text(x
+          //     "🙏",
+          //     style: TextStyle(
+          //       fontSize: 15.0,
+          //     ),
+          //   ),
+          // ),
+          // Positioned(
+          //   top: 20.0,
+          //   right: 20.0,
+          //   child: Text(
+          //     "😊",
+          //     style: TextStyle(
+          //       fontSize: 15.0,
+          //     ),
+          //   ),
+          // ),
+
+          Center(
+            child: Text(
+              "Support the developer!",
+              style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w200),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> _buildTimelineDay() {

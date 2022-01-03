@@ -201,18 +201,18 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(
           height: 20.0,
         ),
-        if (banner == null)
-          SizedBox(
-            height: 50,
-          )
-        else
-          Container(
-              margin: EdgeInsets.only(left: 20.0, right: 20.0),
-              height: 50,
-              child: AdWidget(ad: banner)),
-        SizedBox(
-          height: 20.0,
-        ),
+        // if (banner == null)
+        //   SizedBox(
+        //     height: 50,
+        //   )
+        // else
+        //   Container(
+        //       margin: EdgeInsets.only(left: 20.0, right: 20.0),
+        //       height: 50,
+        //       child: AdWidget(ad: banner)),
+        // SizedBox(
+        //   height: 20.0,
+        // ),
         _buildTasks(),
         SizedBox(
           height: 150.0,
